@@ -1,0 +1,215 @@
+<div *ngIf="isOpen" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+     (click)="close()">
+  <div class="bg-white rounded-2xl shadow-2xl max-w-5xl w-full max-h-[90vh] overflow-hidden"
+       (click)="$event.stopPropagation()">
+    
+    <!-- Header -->
+    <div class="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-6">
+      <div class="flex items-center justify-between">
+        <div>
+          <h2 class="text-2xl font-bold">{{ workerName }}'s Tasks</h2>
+          <p class="text-blue-100 mt-1">View all assigned tasks and their status</p>
+        </div>
+        <button (click)="close()" 
+                class="text-white hover:bg-white hover:bg-opacity-20 rounded-full p-2 transition-colors">
+          <i class="fas fa-times text-xl"></i>
+        </button>
+      </div>
+
+      <!-- Stats Summary -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mt-6">
+        <div class="bg-white bg-opacity-20 rounded-lg p-3 text-center">
+          <p class="text-2xl font-bold">{{ stats.total }}</p>
+          <p class="text-xs text-blue-100">Total</p>
+        </div>
+        <div class="bg-yellow-500 bg-opacity-90 rounded-lg p-3 text-center">
+          <p class="text-2xl font-bold">{{ stats.pending }}</p>
+          <p class="text-xs">Pending</p>
+        </div>
+        <div class="bg-blue-500 bg-opacity-90 rounded-lg p-3 text-center">
+          <p class="text-2xl font-bold">{{ stats.inProgress }}</p>
+          <p class="text-xs">In Progress</p>
+        </div>
+        <div class="bg-green-500 bg-opacity-90 rounded-lg p-3 text-center">
+          <p class="text-2xl font-bold">{{ stats.completed }}</p>
+          <p class="text-xs">Completed</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="p-4 bg-gray-50 border-b border-gray-200">
+      <div class="flex flex-wrap items-center gap-4">
+        <div class="flex items-center space-x-2">
+          <label class="text-sm font-medium text-gray-700">Status:</label>
+          <select [(ngModel)]="selectedStatus" 
+                  class="border border-gray-300 rounded-lg px-3 py-1.5 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+            <option value="ALL">All Status</option>
+            <option value="PENDING">Pending</option>
+            <option value="IN_PROGRESS">In Progress</option>
+            <option value="COMPLETED">Completed</option>
+          </select>
+        </div>
+
+        <div class="flex items-center space-x-2">
+          <label class="text-sm font-medium text-gray-700">Priority:</label>
+          <select [(ngModel)]="selectedPriority" 
+                  class="border border-gray-300 rounded-lg px-3 py-1.5 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+            <option value="ALL">All Priorities</option>
+            <option value="LOW">Low</option>
+            <option value="MEDIUM">Medium</option>
+            <option value="HIGH">High</option>
+            <option value="URGENT">Urgent</option>
+          </select>
+        </div>
+
+        <button (click)="refreshTasks()" 
+                class="ml-auto bg-blue-600 text-white px-4 py-1.5 rounded-lg hover:bg-blue-700 transition-colors text-sm">
+          <i class="fas fa-sync-alt mr-2"></i>
+          Refresh
+        </button>
+      </div>
+    </div>
+
+    <!-- Content -->
+    <div class="p-6 overflow-y-auto" style="max-height: calc(90vh - 280px);">
+      <!-- Loading State -->
+      <div *ngIf="loading" class="flex items-center justify-center py-12">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <span class="ml-3 text-gray-600">Loading tasks...</span>
+      </div>
+
+      <!-- Error State -->
+      <div *ngIf="error" class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg flex items-center">
+        <i class="fas fa-exclamation-circle mr-3 text-red-500"></i>
+        <span>{{ error }}</span>
+      </div>
+
+      <!-- Empty State -->
+      <div *ngIf="!loading && !error && getFilteredTasks().length === 0" class="text-center py-12">
+        <div class="mx-auto h-20 w-20 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+          <i class="fas fa-tasks text-gray-400 text-3xl"></i>
+        </div>
+        <h3 class="text-lg font-semibold text-gray-900 mb-2">No Tasks Found</h3>
+        <p class="text-gray-600">
+          {{ selectedStatus !== 'ALL' || selectedPriority !== 'ALL' 
+             ? 'No tasks match the selected filters' 
+             : 'No tasks have been assigned to this worker yet' }}
+        </p>
+      </div>
+
+      <!-- Tasks List -->
+      <div *ngIf="!loading && !error && getFilteredTasks().length > 0" class="space-y-4">
+        <div *ngFor="let task of getFilteredTasks()" 
+             class="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+          
+          <!-- Task Header -->
+          <div class="flex items-start justify-between mb-3">
+            <div class="flex-1">
+              <h3 class="font-semibold text-gray-900 text-lg">{{ task.title }}</h3>
+              <p class="text-sm text-gray-600 mt-1">{{ task.description }}</p>
+            </div>
+            <div class="flex items-center space-x-2 ml-4">
+              <span class="px-3 py-1 rounded-full text-xs font-medium" [ngClass]="getStatusClass(task.status)">
+                {{ formatStatus(task.status) }}
+              </span>
+            </div>
+          </div>
+
+          <!-- Task Details -->
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+            <div>
+              <p class="text-gray-500 mb-1">
+                <i class="fas fa-tag mr-1"></i>
+                Category
+              </p>
+              <p class="font-medium text-gray-900">{{ task.category || 'N/A' }}</p>
+            </div>
+
+            <div>
+              <p class="text-gray-500 mb-1">
+                <i class="fas fa-flag mr-1"></i>
+                Priority
+              </p>
+              <p class="font-medium" [ngClass]="getPriorityClass(task.priority)">
+                {{ task.priority }}
+              </p>
+            </div>
+
+            <div>
+              <p class="text-gray-500 mb-1">
+                <i class="fas fa-calendar mr-1"></i>
+                Due Date
+              </p>
+              <p class="font-medium" [ngClass]="{ 'text-red-600': isTaskOverdue(task) }">
+                {{ task.dueDate ? (task.dueDate | date:'shortDate') : 'N/A' }}
+                <span *ngIf="isTaskOverdue(task)" class="text-xs ml-1">(OVERDUE)</span>
+              </p>
+            </div>
+
+            <div>
+              <p class="text-gray-500 mb-1">
+                <i class="fas fa-clock mr-1"></i>
+                Hours
+              </p>
+              <p class="font-medium text-gray-900">
+                {{ task.actualHours || task.estimatedHours || 'N/A' }}
+                <span class="text-xs text-gray-500">hrs</span>
+              </p>
+            </div>
+          </div>
+
+          <!-- Completion Info -->
+          <div *ngIf="task.status === 'COMPLETED' && task.completionNotes" 
+               class="mt-3 p-3 bg-green-50 border border-green-200 rounded-lg">
+            <p class="text-sm font-medium text-green-800 mb-1">
+              <i class="fas fa-check-circle mr-1"></i>
+              Completion Notes:
+            </p>
+            <p class="text-sm text-green-700">{{ task.completionNotes }}</p>
+            <p *ngIf="task.completedAt" class="text-xs text-green-600 mt-1">
+              Completed: {{ task.completedAt | date:'medium' }}
+            </p>
+          </div>
+
+          <!-- Delay Info -->
+          <div *ngIf="task.reasonForDelay" 
+               class="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+            <p class="text-sm font-medium text-yellow-800 mb-1">
+              <i class="fas fa-exclamation-triangle mr-1"></i>
+              Reason for Delay:
+            </p>
+            <p class="text-sm text-yellow-700">{{ task.reasonForDelay }}</p>
+            <p *ngIf="task.estimatedCompletionDate" class="text-xs text-yellow-600 mt-1">
+              New estimated completion: {{ task.estimatedCompletionDate | date:'shortDate' }}
+            </p>
+          </div>
+
+          <!-- Task Metadata -->
+          <div class="mt-3 pt-3 border-t border-gray-200 flex items-center justify-between text-xs text-gray-500">
+            <div>
+              <span>Created: {{ task.createdAt | date:'shortDate' }}</span>
+              <span class="mx-2">•</span>
+              <span>By: {{ task.createdBy.firstName }} {{ task.createdBy.lastName }}</span>
+            </div>
+            <div *ngIf="task.farm">
+              <i class="fas fa-seedling mr-1"></i>
+              {{ task.farm.name }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="p-4 bg-gray-50 border-t border-gray-200 flex items-center justify-between">
+      <p class="text-sm text-gray-600">
+        Showing {{ getFilteredTasks().length }} of {{ stats.total }} tasks
+      </p>
+      <button (click)="close()" 
+              class="bg-gray-600 text-white px-6 py-2 rounded-lg hover:bg-gray-700 transition-colors">
+        Close
+      </button>
+    </div>
+  </div>
+</div>

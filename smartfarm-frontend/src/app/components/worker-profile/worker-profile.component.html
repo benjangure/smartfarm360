@@ -1,0 +1,201 @@
+<div class="worker-profile">
+  <div class="profile-header">
+    <div class="profile-avatar">
+      <div class="avatar-circle">
+        {{ getInitials() }}
+      </div>
+    </div>
+    <div class="profile-info">
+      <h1>{{ profileData.firstName }} {{ profileData.lastName }}</h1>
+      <p class="role">Farm Worker</p>
+      <div class="experience" *ngIf="profileData.experience">
+        <i class="fas fa-calendar-alt"></i>
+        {{ profileData.experience }}
+      </div>
+    </div>
+    <div class="profile-actions">
+      <button 
+        *ngIf="!isEditing" 
+        (click)="toggleEdit()" 
+        class="btn btn-primary">
+        <i class="fas fa-edit"></i>
+        Edit Profile
+      </button>
+      <div *ngIf="isEditing" class="edit-actions">
+        <button 
+          (click)="saveProfile()" 
+          [disabled]="loading"
+          class="btn btn-success">
+          <i class="fas fa-save" [class.spinning]="loading"></i>
+          {{ loading ? 'Saving...' : 'Save' }}
+        </button>
+        <button 
+          (click)="toggleEdit()" 
+          [disabled]="loading"
+          class="btn btn-secondary">
+          <i class="fas fa-times"></i>
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="alert alert-error" *ngIf="error">
+    <i class="fas fa-exclamation-triangle"></i>
+    {{ error }}
+  </div>
+
+  <div class="alert alert-success" *ngIf="success">
+    <i class="fas fa-check-circle"></i>
+    {{ success }}
+  </div>
+
+  <div class="profile-content">
+    <!-- Personal Information -->
+    <div class="section">
+      <h3>
+        <i class="fas fa-user"></i>
+        Personal Information
+      </h3>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>First Name</label>
+          <input 
+            type="text" 
+            [(ngModel)]="profileData.firstName"
+            [readonly]="!isEditing"
+            [class.readonly]="!isEditing">
+        </div>
+        <div class="form-group">
+          <label>Last Name</label>
+          <input 
+            type="text" 
+            [(ngModel)]="profileData.lastName"
+            [readonly]="!isEditing"
+            [class.readonly]="!isEditing">
+        </div>
+        <div class="form-group">
+          <label>Email</label>
+          <input 
+            type="email" 
+            [(ngModel)]="profileData.email"
+            [readonly]="!isEditing"
+            [class.readonly]="!isEditing">
+        </div>
+        <div class="form-group">
+          <label>Phone</label>
+          <input 
+            type="tel" 
+            [(ngModel)]="profileData.phone"
+            [readonly]="!isEditing"
+            [class.readonly]="!isEditing">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Address</label>
+        <textarea 
+          [(ngModel)]="profileData.address"
+          [readonly]="!isEditing"
+          [class.readonly]="!isEditing"
+          rows="2">
+        </textarea>
+      </div>
+    </div>
+
+    <!-- Emergency Contact -->
+    <div class="section">
+      <h3>
+        <i class="fas fa-phone"></i>
+        Emergency Contact
+      </h3>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Contact Name</label>
+          <input 
+            type="text" 
+            [(ngModel)]="profileData.emergencyContact"
+            [readonly]="!isEditing"
+            [class.readonly]="!isEditing">
+        </div>
+        <div class="form-group">
+          <label>Contact Phone</label>
+          <input 
+            type="tel" 
+            [(ngModel)]="profileData.emergencyPhone"
+            [readonly]="!isEditing"
+            [class.readonly]="!isEditing">
+        </div>
+      </div>
+    </div>
+
+    <!-- Skills & Experience -->
+    <div class="section">
+      <h3>
+        <i class="fas fa-tools"></i>
+        Skills & Experience
+      </h3>
+      
+      <div class="form-group">
+        <label>Experience</label>
+        <input 
+          type="text" 
+          [(ngModel)]="profileData.experience"
+          [readonly]="!isEditing"
+          [class.readonly]="!isEditing"
+          placeholder="e.g., 3 years in organic farming">
+      </div>
+
+      <div class="form-group">
+        <label>Skills</label>
+        <div class="skills-container">
+          <div 
+            *ngFor="let skill of availableSkills" 
+            class="skill-tag"
+            [class.selected]="hasSkill(skill)"
+            [class.clickable]="isEditing"
+            (click)="isEditing && toggleSkill(skill)">
+            <i class="fas fa-check" *ngIf="hasSkill(skill)"></i>
+            {{ skill }}
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Additional Notes</label>
+        <textarea 
+          [(ngModel)]="profileData.notes"
+          [readonly]="!isEditing"
+          [class.readonly]="!isEditing"
+          rows="3"
+          placeholder="Any additional information about your experience or preferences...">
+        </textarea>
+      </div>
+    </div>
+
+    <!-- Statistics -->
+    <div class="section">
+      <h3>
+        <i class="fas fa-chart-bar"></i>
+        Quick Stats
+      </h3>
+      <div class="stats-grid">
+        <div class="stat-item">
+          <div class="stat-value">{{ profileData.skills.length }}</div>
+          <div class="stat-label">Skills</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value">{{ getExperienceYears() }}</div>
+          <div class="stat-label">Years Experience</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value">{{ currentUser?.assignedFarm?.name || 'N/A' }}</div>
+          <div class="stat-label">Assigned Farm</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value">Active</div>
+          <div class="stat-label">Status</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

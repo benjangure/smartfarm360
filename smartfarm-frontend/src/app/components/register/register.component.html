@@ -1,0 +1,289 @@
+<div class="min-h-screen flex items-center justify-center relative overflow-hidden">
+  <!-- Creative CSS Background -->
+  <div class="absolute inset-0 z-0">
+    <div class="w-full h-full bg-gradient-to-br from-emerald-900 via-green-800 to-teal-900 relative">
+      <!-- Animated Background Pattern -->
+      <div class="absolute inset-0 opacity-10">
+        <div class="absolute top-0 left-0 w-full h-full animate-pulse" 
+             style="background-image: radial-gradient(circle at 30% 70%, #10b981 2px, transparent 2px), radial-gradient(circle at 70% 30%, #059669 1px, transparent 1px); background-size: 60px 60px, 40px 40px;"></div>
+      </div>
+      <!-- Geometric Shapes -->
+      <div class="absolute top-32 right-32 w-40 h-40 bg-emerald-500/10 rounded-full animate-bounce" style="animation-delay: 0.5s; animation-duration: 4s;"></div>
+      <div class="absolute bottom-32 left-32 w-28 h-28 bg-green-500/10 rounded-full animate-bounce" style="animation-delay: 1.5s; animation-duration: 5s;"></div>
+      <div class="absolute top-1/3 right-10 w-20 h-20 bg-teal-500/10 rotate-45 animate-pulse" style="animation-delay: 3s;"></div>
+    </div>
+  </div>
+  
+  <!-- Floating Elements -->
+  <div class="absolute top-10 left-10 text-white/20 z-20 hidden lg:block floating-icon">
+    <i class="fas fa-tractor text-6xl"></i>
+  </div>
+  <div class="absolute bottom-10 right-10 text-white/20 z-20 hidden lg:block floating-icon">
+    <i class="fas fa-wheat-awn text-5xl"></i>
+  </div>
+  <div class="absolute top-1/4 right-1/4 text-white/10 z-20 hidden lg:block floating-icon">
+    <i class="fas fa-seedling text-4xl"></i>
+  </div>
+
+  <div class="max-w-2xl w-full space-y-8 z-30 relative mx-4">
+    <!-- Logo and Header -->
+    <div class="text-center">
+      <div class="mx-auto h-24 w-24 bg-white/10 backdrop-blur-sm rounded-2xl flex items-center justify-center mb-6 border border-white/20 p-2">
+        <img src="assets/images/logo.jpg" 
+             alt="SmartFarm360 Logo" 
+             class="w-full h-full object-contain rounded-xl"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <i class="fas fa-seedling text-white text-3xl hidden"></i>
+      </div>
+      <h2 class="text-4xl font-bold text-white mb-2 drop-shadow-lg">Join SmartFarm360</h2>
+      <p class="text-green-100 text-lg">Create your farm management account</p>
+    </div>
+
+    <!-- Registration Form -->
+    <div class="bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl p-8 border border-white/20">
+      <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="space-y-6">
+        <!-- Success Message -->
+        <div *ngIf="success" class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-xl flex items-center">
+          <i class="fas fa-check-circle mr-3 text-green-500"></i>
+          <span>{{ success }}</span>
+        </div>
+
+        <!-- Error Message -->
+        <div *ngIf="error" class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl flex items-center">
+          <i class="fas fa-exclamation-circle mr-3 text-red-500"></i>
+          <span>{{ error }}</span>
+        </div>
+
+        <!-- Personal Information Section -->
+        <div class="space-y-4">
+          <h3 class="text-lg font-semibold text-gray-800 border-b border-gray-200 pb-2">
+            <i class="fas fa-user mr-2 text-green-600"></i>
+            Personal Information
+          </h3>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- First Name -->
+            <div class="space-y-2">
+              <label for="firstName" class="block text-sm font-medium text-gray-700">
+                <i class="fas fa-user mr-2 text-green-600"></i>First Name
+              </label>
+              <input
+                id="firstName"
+                type="text"
+                formControlName="firstName"
+                class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200"
+                [class.border-red-300]="f['firstName'].invalid && f['firstName'].touched"
+                placeholder="Enter your first name"
+              />
+              <div *ngIf="f['firstName'].invalid && f['firstName'].touched" class="text-red-600 text-sm flex items-center">
+                <i class="fas fa-exclamation-triangle mr-1"></i>
+                <span *ngIf="f['firstName'].errors?.['required']">First name is required</span>
+                <span *ngIf="f['firstName'].errors?.['minlength']">First name must be at least 2 characters</span>
+              </div>
+            </div>
+
+            <!-- Last Name -->
+            <div class="space-y-2">
+              <label for="lastName" class="block text-sm font-medium text-gray-700">
+                <i class="fas fa-user mr-2 text-green-600"></i>Last Name
+              </label>
+              <input
+                id="lastName"
+                type="text"
+                formControlName="lastName"
+                class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200"
+                [class.border-red-300]="f['lastName'].invalid && f['lastName'].touched"
+                placeholder="Enter your last name"
+              />
+              <div *ngIf="f['lastName'].invalid && f['lastName'].touched" class="text-red-600 text-sm flex items-center">
+                <i class="fas fa-exclamation-triangle mr-1"></i>
+                <span *ngIf="f['lastName'].errors?.['required']">Last name is required</span>
+                <span *ngIf="f['lastName'].errors?.['minlength']">Last name must be at least 2 characters</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Email -->
+          <div class="space-y-2">
+            <label for="email" class="block text-sm font-medium text-gray-700">
+              <i class="fas fa-envelope mr-2 text-green-600"></i>Email Address
+            </label>
+            <input
+              id="email"
+              type="email"
+              formControlName="email"
+              class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200"
+              [class.border-red-300]="f['email'].invalid && f['email'].touched"
+              placeholder="Enter your email address"
+            />
+            <div *ngIf="f['email'].invalid && f['email'].touched" class="text-red-600 text-sm flex items-center">
+              <i class="fas fa-exclamation-triangle mr-1"></i>
+              <span *ngIf="f['email'].errors?.['required']">Email is required</span>
+              <span *ngIf="f['email'].errors?.['email']">Please enter a valid email address</span>
+            </div>
+          </div>
+
+          <!-- Phone Number -->
+          <div class="space-y-2">
+            <label for="phoneNumber" class="block text-sm font-medium text-gray-700">
+              <i class="fas fa-phone mr-2 text-green-600"></i>Phone Number (Optional)
+            </label>
+            <input
+              id="phoneNumber"
+              type="tel"
+              formControlName="phoneNumber"
+              class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200"
+              [class.border-red-300]="f['phoneNumber'].invalid && f['phoneNumber'].touched"
+              placeholder="Enter your phone number"
+            />
+            <div *ngIf="f['phoneNumber'].invalid && f['phoneNumber'].touched" class="text-red-600 text-sm flex items-center">
+              <i class="fas fa-exclamation-triangle mr-1"></i>
+              <span>Please enter a valid phone number</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Account Information Section -->
+        <div class="space-y-4">
+          <h3 class="text-lg font-semibold text-gray-800 border-b border-gray-200 pb-2">
+            <i class="fas fa-key mr-2 text-green-600"></i>
+            Account Information
+          </h3>
+
+          <!-- Username -->
+          <div class="space-y-2">
+            <label for="username" class="block text-sm font-medium text-gray-700">
+              <i class="fas fa-at mr-2 text-green-600"></i>Username
+            </label>
+            <input
+              id="username"
+              type="text"
+              formControlName="username"
+              class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200"
+              [class.border-red-300]="f['username'].invalid && f['username'].touched"
+              placeholder="Choose a unique username"
+            />
+            <div *ngIf="f['username'].invalid && f['username'].touched" class="text-red-600 text-sm flex items-center">
+              <i class="fas fa-exclamation-triangle mr-1"></i>
+              <span *ngIf="f['username'].errors?.['required']">Username is required</span>
+              <span *ngIf="f['username'].errors?.['minlength']">Username must be at least 3 characters</span>
+              <span *ngIf="f['username'].errors?.['maxlength']">Username must not exceed 20 characters</span>
+            </div>
+          </div>
+
+          <!-- User Role -->
+          <div class="space-y-2">
+            <label for="role" class="block text-sm font-medium text-gray-700">
+              <i class="fas fa-users-cog mr-2 text-green-600"></i>User Role
+            </label>
+            <select
+              id="role"
+              formControlName="role"
+              class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200"
+              [class.border-red-300]="f['role'].invalid && f['role'].touched"
+            >
+              <option value="">Select your role</option>
+              <option *ngFor="let role of userRoles" [value]="role.value">
+                {{ role.label }} - {{ role.description }}
+              </option>
+            </select>
+            <div *ngIf="f['role'].invalid && f['role'].touched" class="text-red-600 text-sm flex items-center">
+              <i class="fas fa-exclamation-triangle mr-1"></i>
+              <span>Please select a user role</span>
+            </div>
+            
+            <!-- Role Preview -->
+            <div *ngIf="f['role'].value" class="mt-2 p-3 bg-green-50 rounded-lg border border-green-200">
+              <div class="flex items-center">
+                <i [class]="getRoleIcon(f['role'].value) + ' text-green-600 mr-2'"></i>
+                <div>
+                  <p class="text-sm font-medium text-green-800">{{ f['role'].value }}</p>
+                  <p class="text-xs text-green-600">{{ getRoleDescription(f['role'].value) }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Password -->
+          <div class="space-y-2">
+            <label for="password" class="block text-sm font-medium text-gray-700">
+              <i class="fas fa-lock mr-2 text-green-600"></i>Password
+            </label>
+            <div class="relative">
+              <input
+                id="password"
+                [type]="showPassword ? 'text' : 'password'"
+                formControlName="password"
+                class="w-full px-4 py-3 pr-12 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200"
+                [class.border-red-300]="f['password'].invalid && f['password'].touched"
+                placeholder="Create a secure password"
+              />
+              <button
+                type="button"
+                (click)="togglePasswordVisibility()"
+                class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
+              >
+                <i [class]="showPassword ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
+              </button>
+            </div>
+            <div *ngIf="f['password'].invalid && f['password'].touched" class="text-red-600 text-sm flex items-center">
+              <i class="fas fa-exclamation-triangle mr-1"></i>
+              <span *ngIf="f['password'].errors?.['required']">Password is required</span>
+              <span *ngIf="f['password'].errors?.['minlength']">Password must be at least 6 characters</span>
+            </div>
+          </div>
+
+          <!-- Confirm Password -->
+          <div class="space-y-2">
+            <label for="confirmPassword" class="block text-sm font-medium text-gray-700">
+              <i class="fas fa-lock mr-2 text-green-600"></i>Confirm Password
+            </label>
+            <div class="relative">
+              <input
+                id="confirmPassword"
+                [type]="showConfirmPassword ? 'text' : 'password'"
+                formControlName="confirmPassword"
+                class="w-full px-4 py-3 pr-12 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200"
+                [class.border-red-300]="f['confirmPassword'].invalid && f['confirmPassword'].touched"
+                placeholder="Confirm your password"
+              />
+              <button
+                type="button"
+                (click)="toggleConfirmPasswordVisibility()"
+                class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
+              >
+                <i [class]="showConfirmPassword ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
+              </button>
+            </div>
+            <div *ngIf="f['confirmPassword'].invalid && f['confirmPassword'].touched" class="text-red-600 text-sm flex items-center">
+              <i class="fas fa-exclamation-triangle mr-1"></i>
+              <span *ngIf="f['confirmPassword'].errors?.['required']">Please confirm your password</span>
+              <span *ngIf="f['confirmPassword'].errors?.['passwordMismatch']">Passwords do not match</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Register Button -->
+        <button
+          type="submit"
+          [disabled]="loading || registerForm.invalid"
+          class="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-200 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none shadow-lg"
+        >
+          <span *ngIf="loading" class="inline-block animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></span>
+          <i *ngIf="!loading" class="fas fa-user-plus mr-2"></i>
+          {{ loading ? 'Creating Account...' : 'Create Account' }}
+        </button>
+
+        <!-- Login Link -->
+        <div class="text-center">
+          <p class="text-gray-600">
+            Already have an account?
+            <a routerLink="/login" class="text-green-600 hover:text-green-700 font-medium ml-1">
+              Sign in here
+            </a>
+          </p>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

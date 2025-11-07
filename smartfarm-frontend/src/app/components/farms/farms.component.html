@@ -1,0 +1,331 @@
+<div class="space-y-8 p-6 min-h-screen relative overflow-hidden">
+  <!-- Creative Background -->
+  <div class="absolute inset-0 -z-10">
+    <div class="w-full h-full bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 relative">
+      <!-- Farm Pattern -->
+      <div class="absolute inset-0 opacity-15" 
+           style="background-image: radial-gradient(circle at 20% 80%, #10b981 2px, transparent 2px), radial-gradient(circle at 80% 20%, #059669 1px, transparent 1px), radial-gradient(circle at 40% 40%, #0d9488 1px, transparent 1px); background-size: 50px 50px, 30px 30px, 70px 70px;"></div>
+      <!-- Floating Farm Elements -->
+      <div class="absolute top-20 right-20 w-52 h-52 bg-gradient-to-br from-green-200/30 to-emerald-300/30 rounded-full blur-3xl animate-pulse"></div>
+      <div class="absolute bottom-20 left-20 w-40 h-40 bg-gradient-to-br from-teal-200/30 to-green-300/30 rounded-full blur-3xl animate-pulse" style="animation-delay: 1.5s;"></div>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <div class="bg-white rounded-2xl shadow-lg p-6 border border-green-100">
+    <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between">
+      <div class="flex items-center space-x-4">
+        <div class="h-16 w-16 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full flex items-center justify-center">
+          <i class="fas fa-seedling text-white text-2xl"></i>
+        </div>
+        <div>
+          <h1 class="text-3xl font-bold bg-gradient-to-r from-green-700 to-emerald-600 bg-clip-text text-transparent">
+            Farm Management
+          </h1>
+          <p class="text-gray-600 mt-1 flex items-center">
+            <i class="fas fa-map-marker-alt text-green-500 mr-2"></i>
+            Manage farm locations and operations
+          </p>
+        </div>
+      </div>
+      <div class="mt-4 lg:mt-0 flex items-center space-x-4">
+        <div *ngIf="isSystemAdmin()" class="bg-blue-100 text-blue-800 px-4 py-2 rounded-lg">
+          <i class="fas fa-eye mr-2"></i>
+          Admin Oversight View
+        </div>
+        <button 
+          *ngIf="canCreateFarm()"
+          (click)="openCreateForm()"
+          class="bg-gradient-to-r from-green-600 to-emerald-600 text-white px-6 py-3 rounded-xl hover:from-green-700 hover:to-emerald-700 transition-all duration-200 transform hover:scale-105">
+          <i class="fas fa-plus mr-2"></i>
+          Add New Farm
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Farms Grid -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div *ngFor="let farm of farms" class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1">
+      <!-- Farm Header -->
+      <div class="bg-gradient-to-r from-green-500 to-emerald-600 p-6 text-white">
+        <div class="flex items-center justify-between">
+          <div>
+            <h3 class="text-xl font-bold">{{ farm.name }}</h3>
+            <p class="text-green-100 flex items-center mt-1">
+              <i class="fas fa-map-marker-alt mr-2"></i>
+              {{ farm.location }}
+            </p>
+          </div>
+          <div class="text-right">
+            <div class="bg-white/20 rounded-lg p-2">
+              <i class="fas fa-seedling text-2xl"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Farm Details -->
+      <div class="p-6">
+        <div class="space-y-4">
+          <!-- Show owner info for system admin -->
+          <div *ngIf="isSystemAdmin() && farm.owner" class="flex items-center justify-between bg-blue-50 p-3 rounded-lg">
+            <span class="text-blue-700 font-medium">Owner:</span>
+            <span class="font-semibold text-blue-900">{{ farm.owner.firstName }} {{ farm.owner.lastName }}</span>
+          </div>
+          
+          <div class="flex items-center justify-between">
+            <span class="text-gray-600">Size:</span>
+            <span class="font-semibold text-gray-900">{{ farm.size }} {{ farm.sizeUnit }}</span>
+          </div>
+          
+          <div class="flex items-center justify-between">
+            <span class="text-gray-600">Crops:</span>
+            <span class="font-semibold text-gray-900">{{ farm.cropsCount || 0 }}</span>
+          </div>
+          
+          <div class="flex items-center justify-between">
+            <span class="text-gray-600">Livestock:</span>
+            <span class="font-semibold text-gray-900">{{ farm.livestockCount || 0 }}</span>
+          </div>
+          
+          <div class="flex items-center justify-between">
+            <span class="text-gray-600">Workers:</span>
+            <span class="font-semibold text-gray-900">{{ farm.workersCount || 0 }}</span>
+          </div>
+        </div>
+
+        <div class="mt-6 pt-4 border-t border-gray-200">
+          <div class="flex items-center justify-between">
+            <button 
+              (click)="viewFarm(farm)"
+              class="text-green-600 hover:text-green-700 font-medium">
+              <i class="fas fa-eye mr-1"></i>
+              View Details
+            </button>
+            <!-- Only show edit/delete for farm owners -->
+            <div *ngIf="!isSystemAdmin()" class="flex items-center space-x-2">
+              <button 
+                *ngIf="canEditFarm()"
+                (click)="editFarm(farm)"
+                class="p-2 text-blue-600 hover:bg-blue-100 rounded-lg transition-colors">
+                <i class="fas fa-edit"></i>
+              </button>
+              <button 
+                *ngIf="canDeleteFarm()"
+                (click)="deleteFarm(farm)"
+                class="p-2 text-red-600 hover:bg-red-100 rounded-lg transition-colors">
+                <i class="fas fa-trash"></i>
+              </button>
+            </div>
+            <!-- Show read-only indicator for system admin -->
+            <div *ngIf="isSystemAdmin()" class="text-blue-600 text-sm">
+              <i class="fas fa-lock mr-1"></i>
+              Read Only
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Add Farm Card - Only for farm owners -->
+    <div *ngIf="canCreateFarm()" class="bg-white rounded-2xl shadow-lg border-2 border-dashed border-gray-300 hover:border-green-400 transition-all duration-300 cursor-pointer"
+         (click)="openCreateModal()">
+      <div class="p-12 text-center">
+        <div class="mx-auto h-16 w-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
+          <i class="fas fa-plus text-green-600 text-2xl"></i>
+        </div>
+        <h3 class="text-lg font-semibold text-gray-900 mb-2">Add New Farm</h3>
+        <p class="text-gray-600">Create a new farm location</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="flex items-center justify-center py-12">
+    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600"></div>
+    <span class="ml-4 text-gray-600">Loading farms...</span>
+  </div>
+</div>
+
+<!-- Create Farm Modal -->
+<div *ngIf="showCreateForm" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+  <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto">
+    <div class="p-6">
+      <div class="flex items-center justify-between mb-6">
+        <h2 class="text-2xl font-bold text-gray-900">Add New Farm</h2>
+        <button (click)="closeCreateForm()" class="text-gray-400 hover:text-gray-600">
+          <i class="fas fa-times text-xl"></i>
+        </button>
+      </div>
+
+      <form (ngSubmit)="createFarm()" #createForm="ngForm">
+        <div class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Farm Name *</label>
+            <input 
+              type="text" 
+              [(ngModel)]="newFarm.name" 
+              name="name"
+              required
+              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              placeholder="Enter farm name">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Location *</label>
+            <input 
+              type="text" 
+              [(ngModel)]="newFarm.location" 
+              name="location"
+              required
+              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              placeholder="Enter farm location">
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Size *</label>
+              <input 
+                type="number" 
+                [(ngModel)]="newFarm.size" 
+                name="size"
+                required
+                min="0"
+                step="0.1"
+                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                placeholder="0">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Unit</label>
+              <select 
+                [(ngModel)]="newFarm.sizeUnit" 
+                name="sizeUnit"
+                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                <option value="acres">Acres</option>
+                <option value="hectares">Hectares</option>
+                <option value="square_meters">Square Meters</option>
+                <option value="square_feet">Square Feet</option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Description</label>
+            <textarea 
+              [(ngModel)]="newFarm.description" 
+              name="description"
+              rows="3"
+              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              placeholder="Enter farm description (optional)"></textarea>
+          </div>
+        </div>
+
+        <div class="flex space-x-4 mt-6">
+          <button 
+            type="submit"
+            [disabled]="!createForm.form.valid || loading"
+            class="flex-1 bg-green-600 text-white py-3 px-4 rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+            <i class="fas fa-plus mr-2"></i>
+            {{ loading ? 'Creating...' : 'Create Farm' }}
+          </button>
+          <button 
+            type="button"
+            (click)="closeCreateForm()"
+            class="flex-1 bg-gray-300 text-gray-700 py-3 px-4 rounded-lg hover:bg-gray-400 transition-colors">
+            Cancel
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Farm Modal -->
+<div *ngIf="showEditForm && selectedFarm" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+  <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto">
+    <div class="p-6">
+      <div class="flex items-center justify-between mb-6">
+        <h2 class="text-2xl font-bold text-gray-900">Edit Farm</h2>
+        <button (click)="closeEditForm()" class="text-gray-400 hover:text-gray-600">
+          <i class="fas fa-times text-xl"></i>
+        </button>
+      </div>
+
+      <form (ngSubmit)="updateFarm()" #editForm="ngForm">
+        <div class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Farm Name *</label>
+            <input 
+              type="text" 
+              [(ngModel)]="selectedFarm.name" 
+              name="name"
+              required
+              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Location *</label>
+            <input 
+              type="text" 
+              [(ngModel)]="selectedFarm.location" 
+              name="location"
+              required
+              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Size *</label>
+              <input 
+                type="number" 
+                [(ngModel)]="selectedFarm.size" 
+                name="size"
+                required
+                min="0"
+                step="0.1"
+                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Unit</label>
+              <select 
+                [(ngModel)]="selectedFarm.sizeUnit" 
+                name="sizeUnit"
+                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                <option value="acres">Acres</option>
+                <option value="hectares">Hectares</option>
+                <option value="square_meters">Square Meters</option>
+                <option value="square_feet">Square Feet</option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Description</label>
+            <textarea 
+              [(ngModel)]="selectedFarm.description" 
+              name="description"
+              rows="3"
+              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"></textarea>
+          </div>
+        </div>
+
+        <div class="flex space-x-4 mt-6">
+          <button 
+            type="submit"
+            [disabled]="!editForm.form.valid || loading"
+            class="flex-1 bg-green-600 text-white py-3 px-4 rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+            <i class="fas fa-save mr-2"></i>
+            {{ loading ? 'Updating...' : 'Update Farm' }}
+          </button>
+          <button 
+            type="button"
+            (click)="closeEditForm()"
+            class="flex-1 bg-gray-300 text-gray-700 py-3 px-4 rounded-lg hover:bg-gray-400 transition-colors">
+            Cancel
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

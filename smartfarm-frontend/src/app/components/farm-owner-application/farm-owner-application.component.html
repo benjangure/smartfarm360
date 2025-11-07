@@ -1,0 +1,214 @@
+<div class="min-h-screen flex items-center justify-center relative overflow-hidden">
+  <!-- Background -->
+  <div class="absolute inset-0 z-0">
+    <div class="w-full h-full bg-gradient-to-br from-emerald-900 via-green-800 to-teal-900 relative">
+      <div class="absolute inset-0 opacity-10">
+        <div class="absolute top-0 left-0 w-full h-full animate-pulse"
+          style="background-image: radial-gradient(circle at 30% 70%, #10b981 2px, transparent 2px), radial-gradient(circle at 70% 30%, #059669 1px, transparent 1px); background-size: 60px 60px, 40px 40px;">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="max-w-4xl w-full space-y-8 z-30 relative mx-4 my-8">
+    <!-- Header -->
+    <div class="text-center">
+      <div
+        class="mx-auto h-24 w-24 bg-white/10 backdrop-blur-sm rounded-2xl flex items-center justify-center mb-6 border border-white/20 p-2">
+        <i class="fas fa-seedling text-white text-3xl"></i>
+      </div>
+      <h2 class="text-4xl font-bold text-white mb-2 drop-shadow-lg">Farm Owner Application</h2>
+      <p class="text-green-100 text-lg">Apply to join SmartFarm360 as a Farm Owner. Once approved, you can create and
+        manage your farms.</p>
+    </div>
+
+    <!-- Application Form -->
+    <div class="bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl p-8 border border-white/20">
+      <form [formGroup]="applicationForm" (ngSubmit)="onSubmit()" class="space-y-8">
+
+        <!-- Error Message -->
+        <div *ngIf="error" class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl flex items-center">
+          <i class="fas fa-exclamation-circle mr-3 text-red-500"></i>
+          <span>{{ error }}</span>
+        </div>
+
+        <!-- Personal Information -->
+        <div class="space-y-6">
+          <h3 class="text-xl font-semibold text-gray-800 border-b border-gray-200 pb-3">
+            <i class="fas fa-user mr-2 text-green-600"></i>
+            Personal Information
+          </h3>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- First Name -->
+            <div class="space-y-2">
+              <label for="firstName" class="block text-sm font-medium text-gray-700">
+                First Name *
+              </label>
+              <input id="firstName" type="text" formControlName="firstName"
+                class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                [class.border-red-300]="f['firstName'].invalid && f['firstName'].touched"
+                placeholder="Enter your first name" />
+              <div *ngIf="f['firstName'].invalid && f['firstName'].touched" class="text-red-600 text-sm">
+                <span *ngIf="f['firstName'].errors?.['required']">First name is required</span>
+                <span *ngIf="f['firstName'].errors?.['minlength']">First name must be at least 2 characters</span>
+              </div>
+            </div>
+
+            <!-- Last Name -->
+            <div class="space-y-2">
+              <label for="lastName" class="block text-sm font-medium text-gray-700">
+                Last Name *
+              </label>
+              <input id="lastName" type="text" formControlName="lastName"
+                class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                [class.border-red-300]="f['lastName'].invalid && f['lastName'].touched"
+                placeholder="Enter your last name" />
+              <div *ngIf="f['lastName'].invalid && f['lastName'].touched" class="text-red-600 text-sm">
+                <span *ngIf="f['lastName'].errors?.['required']">Last name is required</span>
+                <span *ngIf="f['lastName'].errors?.['minlength']">Last name must be at least 2 characters</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Email -->
+            <div class="space-y-2">
+              <label for="email" class="block text-sm font-medium text-gray-700">
+                Email Address *
+              </label>
+              <input id="email" type="email" formControlName="email"
+                class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                [class.border-red-300]="f['email'].invalid && f['email'].touched"
+                placeholder="Enter your email address" />
+              <div *ngIf="f['email'].invalid && f['email'].touched" class="text-red-600 text-sm">
+                <span *ngIf="f['email'].errors?.['required']">Email is required</span>
+                <span *ngIf="f['email'].errors?.['email']">Please enter a valid email address</span>
+              </div>
+            </div>
+
+            <!-- Phone Number -->
+            <div class="space-y-2">
+              <label for="phone" class="block text-sm font-medium text-gray-700">
+                Phone Number *
+              </label>
+              <input id="phone" type="tel" formControlName="phone"
+                class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                [class.border-red-300]="f['phone'].invalid && f['phone'].touched"
+                placeholder="Enter your phone number" />
+              <div *ngIf="f['phone'].invalid && f['phone'].touched" class="text-red-600 text-sm">
+                <span *ngIf="f['phone'].errors?.['required']">Phone number is required</span>
+                <span *ngIf="f['phone'].errors?.['pattern']">Please enter a valid phone number</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Business Information -->
+        <div class="space-y-6">
+          <h3 class="text-xl font-semibold text-gray-800 border-b border-gray-200 pb-3">
+            <i class="fas fa-building mr-2 text-green-600"></i>
+            Business Information
+          </h3>
+
+          <!-- Type of Agricultural Business -->
+          <div class="space-y-2">
+            <label for="farmType" class="block text-sm font-medium text-gray-700">
+              Type of Agricultural Business (Optional)
+            </label>
+            <select id="farmType" formControlName="farmType"
+              class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent">
+              <option value="">Select business type</option>
+              <option *ngFor="let type of businessTypes" [value]="type">{{ type }}</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Additional Information -->
+        <div class="space-y-6">
+          <h3 class="text-xl font-semibold text-gray-800 border-b border-gray-200 pb-3">
+            <i class="fas fa-info-circle mr-2 text-green-600"></i>
+            Additional Information
+          </h3>
+
+          <!-- Expected Users -->
+          <div class="space-y-2">
+            <label for="expectedUsers" class="block text-sm font-medium text-gray-700">
+              Expected Number of Users (Optional)
+            </label>
+            <select id="expectedUsers" formControlName="expectedUsers"
+              class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent">
+              <option value="">Select expected users</option>
+              <option value="1-5">1-5 users</option>
+              <option value="6-15">6-15 users</option>
+              <option value="16-30">16-30 users</option>
+              <option value="31-50">31-50 users</option>
+              <option value="50+">50+ users</option>
+            </select>
+          </div>
+
+          <!-- Comments -->
+          <div class="space-y-2">
+            <label for="comments" class="block text-sm font-medium text-gray-700">
+              Additional Comments (Optional)
+            </label>
+            <textarea id="comments" formControlName="comments" rows="4"
+              class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              [class.border-red-300]="f['comments'].invalid && f['comments'].touched"
+              placeholder="Tell us more about your needs, specific requirements, or any questions you have..."></textarea>
+            <div *ngIf="f['comments'].invalid && f['comments'].touched" class="text-red-600 text-sm">
+              <span *ngIf="f['comments'].errors?.['minlength']">Please provide at least 10 characters</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="flex justify-center">
+          <button type="submit" [disabled]="loading || applicationForm.invalid"
+            class="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-semibold py-4 px-8 rounded-xl transition-all duration-200 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none shadow-lg">
+            <i class="fas fa-paper-plane mr-2"></i>
+            Submit Application
+          </button>
+        </div>
+
+        <!-- Login Link -->
+        <div class="text-center">
+          <p class="text-gray-600">
+            Already have an account?
+            <a routerLink="/login" class="text-green-600 hover:text-green-700 font-medium ml-1">
+              Sign in here
+            </a>
+          </p>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Confirmation Dialog -->
+  <div *ngIf="showConfirmDialog" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-2xl p-8 max-w-md w-full mx-4 shadow-2xl">
+      <div class="text-center">
+        <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100 mb-4">
+          <i class="fas fa-question-circle text-green-600 text-xl"></i>
+        </div>
+        <h3 class="text-lg font-medium text-gray-900 mb-2">Confirm Application Submission</h3>
+        <p class="text-sm text-gray-500 mb-6">
+          Are you sure you want to submit your farm owner application? Once submitted, you will receive an email
+          confirmation and our team will review your application.
+        </p>
+        <div class="flex space-x-4">
+          <button (click)="cancelSubmission()"
+            class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-800 font-medium py-2 px-4 rounded-lg transition-colors">
+            Cancel
+          </button>
+          <button (click)="confirmSubmission()" [disabled]="loading"
+            class="flex-1 bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg transition-colors disabled:opacity-50">
+            <span *ngIf="loading"
+              class="inline-block animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></span>
+            {{ loading ? 'Submitting...' : 'Yes, Submit' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,148 @@
+<div class="worker-tasks">
+  <div class="header">
+    <h2>My Tasks</h2>
+    <button class="refresh-btn" (click)="loadMyTasks()" [disabled]="loading">
+      <i class="fas fa-sync-alt" [class.spinning]="loading"></i>
+      Refresh
+    </button>
+  </div>
+
+  <div class="error-message" *ngIf="error">
+    {{ error }}
+  </div>
+
+  <div class="loading" *ngIf="loading && tasks.length === 0">
+    <i class="fas fa-spinner fa-spin"></i>
+    Loading tasks...
+  </div>
+
+  <div class="tasks-grid" *ngIf="!loading || tasks.length > 0">
+    <div class="task-card" *ngFor="let task of tasks" [class]="getStatusClass(task.status)">
+      <div class="task-header">
+        <h3>{{ task.title }}</h3>
+        <span class="task-priority" [class]="'priority-' + task.priority.toLowerCase()">
+          {{ task.priority }}
+        </span>
+      </div>
+
+      <div class="task-details">
+        <p class="task-description">{{ task.description }}</p>
+        <div class="task-meta">
+          <span class="task-farm">
+            <i class="fas fa-map-marker-alt"></i>
+            {{ task.farm?.name || 'No farm assigned' }}
+          </span>
+          <span class="task-due-date">
+            <i class="fas fa-calendar"></i>
+            Due: {{ task.dueDate | date:'short' }}
+          </span>
+        </div>
+      </div>
+
+      <div class="task-actions">
+        <div class="status-section">
+          <label>Status:</label>
+          <select [value]="task.status" (change)="onStatusChange(task.id, $event)" class="status-select">
+            <option value="PENDING">Pending</option>
+            <option value="IN_PROGRESS">In Progress</option>
+            <option value="COMPLETED">Completed</option>
+            <option value="NOT_DONE">Not Done</option>
+            <option value="TO_BE_DONE_LATER">To Be Done Later</option>
+          </select>
+        </div>
+        
+        <button class="update-btn" (click)="openUpdateModal(task)">
+          <i class="fas fa-edit"></i>
+          Update Details
+        </button>
+      </div>
+
+      <!-- Task Status Info -->
+      <div class="task-status-info" *ngIf="task.completionNotes || task.actualHours">
+        <div class="completion-notes" *ngIf="task.completionNotes">
+          <strong>Notes:</strong> {{ task.completionNotes }}
+        </div>
+        <div class="actual-hours" *ngIf="task.actualHours">
+          <strong>Hours Worked:</strong> {{ task.actualHours }}h
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="empty-state" *ngIf="!loading && tasks.length === 0">
+    <i class="fas fa-tasks"></i>
+    <h3>No tasks assigned</h3>
+    <p>You don't have any tasks assigned at the moment.</p>
+  </div>
+</div>
+
+<!-- Task Update Modal -->
+<div class="modal-overlay" *ngIf="showUpdateModal" (click)="closeUpdateModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>Update Task: {{ selectedTask?.title }}</h3>
+      <button class="close-btn" (click)="closeUpdateModal()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <div class="form-group">
+        <label>Status:</label>
+        <select [(ngModel)]="updateForm.status" class="form-control">
+          <option value="PENDING">Pending</option>
+          <option value="IN_PROGRESS">In Progress</option>
+          <option value="COMPLETED">Completed</option>
+          <option value="NOT_DONE">Not Done</option>
+          <option value="TO_BE_DONE_LATER">To Be Done Later</option>
+        </select>
+      </div>
+
+      <div class="form-group" *ngIf="updateForm.status === 'COMPLETED'">
+        <label>Completion Notes:</label>
+        <textarea [(ngModel)]="updateForm.completionNotes" 
+                  class="form-control" 
+                  rows="3" 
+                  placeholder="Describe what was completed..."></textarea>
+      </div>
+
+      <div class="form-group" *ngIf="updateForm.status === 'NOT_DONE'">
+        <label>Reason for Not Completing:</label>
+        <textarea [(ngModel)]="updateForm.reasonForDelay" 
+                  class="form-control" 
+                  rows="3" 
+                  placeholder="Explain why the task couldn't be completed..."></textarea>
+      </div>
+
+      <div class="form-group" *ngIf="updateForm.status === 'TO_BE_DONE_LATER'">
+        <label>Reason for Delay:</label>
+        <textarea [(ngModel)]="updateForm.reasonForDelay" 
+                  class="form-control" 
+                  rows="3" 
+                  placeholder="Explain why the task needs to be delayed..."></textarea>
+      </div>
+
+      <div class="form-group" *ngIf="updateForm.status === 'TO_BE_DONE_LATER'">
+        <label>Estimated Completion Date:</label>
+        <input type="date" 
+               [(ngModel)]="updateForm.estimatedCompletionDate" 
+               class="form-control">
+      </div>
+
+      <div class="form-group" *ngIf="updateForm.status === 'COMPLETED' || updateForm.status === 'IN_PROGRESS'">
+        <label>Hours Worked:</label>
+        <input type="number" 
+               [(ngModel)]="updateForm.actualHours" 
+               class="form-control" 
+               min="0" 
+               step="0.5" 
+               placeholder="0">
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-secondary" (click)="closeUpdateModal()">Cancel</button>
+      <button class="btn btn-primary" (click)="submitTaskUpdate()">Update Task</button>
+    </div>
+  </div>
+</div>

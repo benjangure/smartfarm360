@@ -1,0 +1,348 @@
+<div class="p-6 space-y-6">
+  <!-- Header -->
+  <div class="flex items-center justify-between">
+    <div>
+      <h1 class="text-3xl font-bold text-gray-900">Worker Dashboard</h1>
+      <p class="text-gray-600 mt-1">{{ getGreeting() }}, {{ currentUser?.firstName }}! Ready to work today?</p>
+      <div *ngIf="assignedFarm" class="flex items-center mt-2 text-sm text-green-700">
+        <i class="fas fa-seedling mr-2"></i>
+        <span>Working at: {{ assignedFarm.name }} - {{ assignedFarm.location }}</span>
+      </div>
+    </div>
+    <div class="flex items-center space-x-4">
+      <div class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">
+        <i class="fas fa-hard-hat mr-1"></i>
+        Farm Worker
+      </div>
+      <div class="text-right text-sm text-gray-600">
+        <p>{{ currentTime | date:'fullDate' }}</p>
+        <p class="text-lg font-semibold text-gray-900">{{ currentTime | date:'shortTime' }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Actions -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <button (click)="goToTasks()" 
+       class="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-6 rounded-xl hover:from-blue-600 hover:to-blue-700 transition-all duration-200 transform hover:scale-105 shadow-lg cursor-pointer">
+      <div class="flex items-center justify-between">
+        <div>
+          <h3 class="text-lg font-semibold">My Tasks</h3>
+          <p class="text-blue-100 text-sm">{{ stats.pendingTasks + stats.inProgressTasks }} active</p>
+        </div>
+        <i class="fas fa-list-check text-3xl text-blue-200"></i>
+      </div>
+    </button>
+
+    <button (click)="goToAttendance()" 
+       class="bg-gradient-to-r from-green-500 to-green-600 text-white p-6 rounded-xl hover:from-green-600 hover:to-green-700 transition-all duration-200 transform hover:scale-105 shadow-lg cursor-pointer">
+      <div class="flex items-center justify-between">
+        <div>
+          <h3 class="text-lg font-semibold">Check In/Out</h3>
+          <p class="text-green-100 text-sm">{{ stats.todayAttendance ? 'Checked in' : 'Not checked in' }}</p>
+        </div>
+        <i class="fas fa-clock text-3xl text-green-200"></i>
+      </div>
+    </button>
+
+    <button (click)="openChat()" 
+       class="bg-gradient-to-r from-purple-500 to-purple-600 text-white p-6 rounded-xl hover:from-purple-600 hover:to-purple-700 transition-all duration-200 transform hover:scale-105 shadow-lg cursor-pointer">
+      <div class="flex items-center justify-between">
+        <div>
+          <h3 class="text-lg font-semibold">Chat with Supervisor</h3>
+          <p class="text-purple-100 text-sm">Send a message</p>
+        </div>
+        <i class="fas fa-comments text-3xl text-purple-200"></i>
+      </div>
+    </button>
+  </div>
+
+  <!-- Today's Status -->
+  <div class="bg-white rounded-xl shadow-lg p-6 border border-gray-200">
+    <h3 class="text-lg font-semibold text-gray-900 mb-4">
+      <i class="fas fa-calendar-day mr-2 text-blue-600"></i>
+      Today's Status
+    </h3>
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+      <!-- Attendance Status -->
+      <div class="text-center">
+        <div class="h-16 w-16 rounded-full flex items-center justify-center mx-auto mb-3"
+             [ngClass]="stats.todayAttendance ? 'bg-green-100' : 'bg-red-100'">
+          <i [class]="stats.todayAttendance ? 'fas fa-check text-green-600 text-2xl' : 'fas fa-times text-red-600 text-2xl'"></i>
+        </div>
+        <p class="text-sm font-medium text-gray-600">Attendance</p>
+        <p class="text-lg font-bold" [ngClass]="stats.todayAttendance ? 'text-green-600' : 'text-red-600'">
+          {{ stats.todayAttendance ? 'Present' : 'Absent' }}
+        </p>
+        <p *ngIf="stats.checkInTime" class="text-xs text-gray-500">In: {{ stats.checkInTime }}</p>
+      </div>
+
+      <!-- Working Hours -->
+      <div class="text-center">
+        <div class="h-16 w-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
+          <i class="fas fa-clock text-blue-600 text-2xl"></i>
+        </div>
+        <p class="text-sm font-medium text-gray-600">Hours Today</p>
+        <p class="text-lg font-bold text-blue-600">{{ getWorkingHours() }}</p>
+        <p *ngIf="!stats.checkOutTime && stats.checkInTime" class="text-xs text-blue-500">Still working</p>
+      </div>
+
+      <!-- Active Tasks -->
+      <div class="text-center">
+        <div class="h-16 w-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-3">
+          <i class="fas fa-tasks text-yellow-600 text-2xl"></i>
+        </div>
+        <p class="text-sm font-medium text-gray-600">Active Tasks</p>
+        <p class="text-lg font-bold text-yellow-600">{{ stats.pendingTasks + stats.inProgressTasks }}</p>
+        <p class="text-xs text-gray-500">{{ stats.pendingTasks }} pending</p>
+      </div>
+
+      <!-- Completed Today -->
+      <div class="text-center">
+        <div class="h-16 w-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
+          <i class="fas fa-check-circle text-green-600 text-2xl"></i>
+        </div>
+        <p class="text-sm font-medium text-gray-600">Completed</p>
+        <p class="text-lg font-bold text-green-600">{{ stats.completedTasks }}</p>
+        <p class="text-xs text-gray-500">Total tasks</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content Grid -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <!-- My Tasks -->
+    <div class="bg-white rounded-xl shadow-lg p-6 border border-gray-200">
+      <h3 class="text-lg font-semibold text-gray-900 mb-4">
+        <i class="fas fa-list-check mr-2 text-blue-600"></i>
+        My Tasks
+      </h3>
+      <div *ngIf="loading" class="flex items-center justify-center py-8">
+        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+      </div>
+      <div *ngIf="!loading && recentTasks.length === 0" class="text-center py-8">
+        <i class="fas fa-list-check text-gray-300 text-4xl mb-4"></i>
+        <p class="text-gray-500">No tasks assigned yet</p>
+      </div>
+      <div *ngIf="!loading && recentTasks.length > 0" class="space-y-4">
+        <div *ngFor="let task of recentTasks" class="p-4 bg-gray-50 rounded-lg border-l-4"
+             [ngClass]="{
+               'border-yellow-400': task.status === 'PENDING',
+               'border-blue-400': task.status === 'IN_PROGRESS',
+               'border-green-400': task.status === 'COMPLETED'
+             }">
+          <div class="flex items-start justify-between mb-2">
+            <div class="flex-1">
+              <h4 class="font-medium text-gray-900">{{ task.title }}</h4>
+              <p class="text-sm text-gray-600 mt-1">{{ task.description }}</p>
+            </div>
+            <div class="flex items-center space-x-2 ml-4">
+              <span class="px-2 py-1 rounded-full text-xs font-medium" [ngClass]="getTaskStatusClass(task.status)">
+                {{ task.status.replace('_', ' ') }}
+              </span>
+            </div>
+          </div>
+          <div class="flex items-center justify-between text-sm">
+            <div class="flex items-center space-x-4">
+              <span class="text-gray-500">
+                <i class="fas fa-tag mr-1"></i>
+                {{ task.category }}
+              </span>
+              <span [class]="getPriorityClass(task.priority)">
+                <i class="fas fa-flag mr-1"></i>
+                {{ task.priority }}
+              </span>
+            </div>
+            <div class="flex items-center space-x-2">
+              <span class="text-gray-500" [ngClass]="{ 'text-red-600': isTaskOverdue(task) }">
+                <i class="fas fa-calendar mr-1"></i>
+                {{ task.dueDate | date:'shortDate' }}
+              </span>
+              <span *ngIf="isTaskOverdue(task)" class="text-red-600 text-xs font-medium">
+                OVERDUE
+              </span>
+            </div>
+          </div>
+        </div>
+        <a routerLink="/dashboard/tasks" class="block text-center text-blue-600 hover:text-blue-700 font-medium py-2">
+          View all tasks →
+        </a>
+      </div>
+    </div>
+
+    <!-- Performance Summary -->
+    <div class="bg-white rounded-xl shadow-lg p-6 border border-gray-200">
+      <h3 class="text-lg font-semibold text-gray-900 mb-4">
+        <i class="fas fa-chart-line mr-2 text-green-600"></i>
+        Performance Summary
+      </h3>
+      
+      <!-- Task Progress -->
+      <div class="mb-6">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-sm font-medium text-gray-700">Task Completion</span>
+          <span class="text-sm text-gray-500">{{ stats.completedTasks }}/{{ stats.totalTasks }}</span>
+        </div>
+        <div class="w-full bg-gray-200 rounded-full h-2">
+          <div class="bg-green-600 h-2 rounded-full transition-all duration-500" 
+               [style.width.%]="(stats.completedTasks / stats.totalTasks) * 100"></div>
+        </div>
+      </div>
+
+      <!-- Attendance Rate -->
+      <div class="mb-6">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-sm font-medium text-gray-700">Attendance Rate</span>
+          <span class="text-sm text-gray-500">{{ stats.attendanceRate }}%</span>
+        </div>
+        <div class="w-full bg-gray-200 rounded-full h-2">
+          <div class="bg-blue-600 h-2 rounded-full transition-all duration-500" 
+               [style.width.%]="stats.attendanceRate"></div>
+        </div>
+      </div>
+
+      <!-- Stats Grid -->
+      <div class="grid grid-cols-2 gap-4">
+        <div class="text-center p-3 bg-gray-50 rounded-lg">
+          <p class="text-2xl font-bold text-gray-900">{{ stats.totalHoursWorked }}</p>
+          <p class="text-sm text-gray-600">Total Hours</p>
+        </div>
+        <div class="text-center p-3 bg-gray-50 rounded-lg">
+          <p class="text-2xl font-bold text-gray-900">{{ Math.round(stats.totalHoursWorked / 30) }}</p>
+          <p class="text-sm text-gray-600">Avg Hours/Day</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tab Navigation -->
+  <div class="bg-white rounded-xl shadow-lg border border-gray-200">
+    <div class="border-b border-gray-200">
+      <nav class="flex space-x-8 px-6">
+        <button 
+          (click)="setActiveTab('overview')"
+          [class]="activeTab === 'overview' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
+          class="py-4 px-1 border-b-2 font-medium text-sm transition-colors">
+          <i class="fas fa-tachometer-alt mr-2"></i>
+          Overview
+        </button>
+        <button 
+          (click)="setActiveTab('tasks')"
+          [class]="activeTab === 'tasks' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
+          class="py-4 px-1 border-b-2 font-medium text-sm transition-colors">
+          <i class="fas fa-tasks mr-2"></i>
+          My Tasks
+        </button>
+        <button 
+          (click)="setActiveTab('attendance')"
+          [class]="activeTab === 'attendance' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
+          class="py-4 px-1 border-b-2 font-medium text-sm transition-colors">
+          <i class="fas fa-clock mr-2"></i>
+          Attendance
+        </button>
+        <button 
+          (click)="setActiveTab('profile')"
+          [class]="activeTab === 'profile' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
+          class="py-4 px-1 border-b-2 font-medium text-sm transition-colors">
+          <i class="fas fa-user mr-2"></i>
+          Profile
+        </button>
+      </nav>
+    </div>
+
+    <!-- Tab Content -->
+    <div class="p-6">
+      <!-- Overview Tab -->
+      <div *ngIf="activeTab === 'overview'">
+        <!-- Upcoming Tasks -->
+        <div *ngIf="upcomingTasks.length > 0" class="mb-6">
+          <h3 class="text-lg font-semibold text-gray-900 mb-4">
+            <i class="fas fa-calendar-alt mr-2 text-purple-600"></i>
+            Upcoming Tasks
+          </h3>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div *ngFor="let task of upcomingTasks" class="p-4 bg-gradient-to-r from-purple-50 to-blue-50 rounded-lg border border-purple-200">
+              <div class="flex items-center justify-between mb-2">
+                <h4 class="font-medium text-gray-900">{{ task.title }}</h4>
+                <i [class]="getTaskStatusIcon(task.status)"></i>
+              </div>
+              <p class="text-sm text-gray-600 mb-3">{{ task.category }}</p>
+              <div class="flex items-center justify-between text-sm">
+                <span [class]="getPriorityClass(task.priority)">
+                  <i class="fas fa-flag mr-1"></i>
+                  {{ task.priority }}
+                </span>
+                <span class="text-gray-500">
+                  {{ task.dueDate | date:'shortDate' }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div class="bg-blue-50 p-4 rounded-lg border border-blue-200">
+            <div class="flex items-center">
+              <i class="fas fa-list-check text-blue-600 text-2xl mr-3"></i>
+              <div>
+                <p class="text-sm text-blue-600 font-medium">Total Tasks</p>
+                <p class="text-2xl font-bold text-blue-700">{{ stats.totalTasks }}</p>
+              </div>
+            </div>
+          </div>
+          <div class="bg-yellow-50 p-4 rounded-lg border border-yellow-200">
+            <div class="flex items-center">
+              <i class="fas fa-clock text-yellow-600 text-2xl mr-3"></i>
+              <div>
+                <p class="text-sm text-yellow-600 font-medium">Pending</p>
+                <p class="text-2xl font-bold text-yellow-700">{{ stats.pendingTasks }}</p>
+              </div>
+            </div>
+          </div>
+          <div class="bg-blue-50 p-4 rounded-lg border border-blue-200">
+            <div class="flex items-center">
+              <i class="fas fa-play-circle text-blue-600 text-2xl mr-3"></i>
+              <div>
+                <p class="text-sm text-blue-600 font-medium">In Progress</p>
+                <p class="text-2xl font-bold text-blue-700">{{ stats.inProgressTasks }}</p>
+              </div>
+            </div>
+          </div>
+          <div class="bg-green-50 p-4 rounded-lg border border-green-200">
+            <div class="flex items-center">
+              <i class="fas fa-check-circle text-green-600 text-2xl mr-3"></i>
+              <div>
+                <p class="text-sm text-green-600 font-medium">Completed</p>
+                <p class="text-2xl font-bold text-green-700">{{ stats.completedTasks }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tasks Tab -->
+      <div *ngIf="activeTab === 'tasks'">
+        <app-worker-tasks></app-worker-tasks>
+      </div>
+
+      <!-- Attendance Tab -->
+      <div *ngIf="activeTab === 'attendance'">
+        <app-worker-checkin></app-worker-checkin>
+      </div>
+
+      <!-- Profile Tab -->
+      <div *ngIf="activeTab === 'profile'">
+        <app-worker-profile></app-worker-profile>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Chat Modal -->
+<app-chat-modal 
+  [isOpen]="showChatModal" 
+  [recipientName]="'Farm Supervisor'"
+  [recipientId]="888"
+  (closeModal)="closeChatModal()">
+</app-chat-modal>

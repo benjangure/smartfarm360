@@ -1,0 +1,22 @@
+// Conversations component styles
+.conversation-item {
+  transition: all 0.2s ease-in-out;
+}
+
+.conversation-item:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.unread-badge {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}

@@ -1,0 +1,221 @@
+<div class="max-w-7xl mx-auto p-6">
+    <!-- Header -->
+    <div class="flex items-center justify-between mb-8">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-900">My Workers</h1>
+            <p class="text-gray-600 mt-1">Manage your farm workers and monitor their performance</p>
+        </div>
+        <a routerLink="/dashboard/add-worker"
+            class="bg-gradient-to-r from-green-600 to-green-700 text-white px-6 py-3 rounded-xl hover:from-green-700 hover:to-green-800 transition-all duration-200 transform hover:scale-105 shadow-lg">
+            <i class="fas fa-user-plus mr-2"></i>
+            Add Worker
+        </a>
+    </div>
+
+    <!-- Breadcrumb -->
+    <nav class="flex mb-6" aria-label="Breadcrumb">
+        <ol class="inline-flex items-center space-x-1 md:space-x-3">
+            <li class="inline-flex items-center">
+                <a routerLink="/dashboard" class="text-gray-500 hover:text-gray-700">Dashboard</a>
+            </li>
+            <li>
+                <div class="flex items-center">
+                    <i class="fas fa-chevron-right text-gray-400 mx-2"></i>
+                    <span class="text-gray-900 font-medium">Workers</span>
+                </div>
+            </li>
+        </ol>
+    </nav>
+
+    <!-- Error Message -->
+    <div *ngIf="error" class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl flex items-center mb-6">
+        <i class="fas fa-exclamation-circle mr-3 text-red-500"></i>
+        <span>{{ error }}</span>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="loading" class="flex items-center justify-center py-12">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600"></div>
+        <span class="ml-3 text-gray-600">Loading workers...</span>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="!loading && workers.length === 0" class="text-center py-12">
+        <div class="mx-auto h-24 w-24 bg-green-100 rounded-full flex items-center justify-center mb-6">
+            <i class="fas fa-hard-hat text-green-600 text-3xl"></i>
+        </div>
+        <h3 class="text-xl font-semibold text-gray-900 mb-2">No Workers Yet</h3>
+        <p class="text-gray-600 mb-6">Start building your team by adding your first worker</p>
+        <a routerLink="/dashboard/add-worker"
+            class="bg-gradient-to-r from-green-600 to-green-700 text-white px-6 py-3 rounded-xl hover:from-green-700 hover:to-green-800 transition-all duration-200 transform hover:scale-105 shadow-lg">
+            <i class="fas fa-user-plus mr-2"></i>
+            Add First Worker
+        </a>
+    </div>
+
+    <!-- Workers Grid -->
+    <div *ngIf="!loading && workers.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div *ngFor="let worker of workers"
+            class="bg-white rounded-xl shadow-lg p-6 border border-gray-200 hover:shadow-xl transition-all duration-200 transform hover:-translate-y-1">
+
+            <!-- Worker Header -->
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center space-x-3">
+                    <div class="h-12 w-12 bg-green-100 rounded-full flex items-center justify-center">
+                        <i class="fas fa-hard-hat text-green-600 text-xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold text-gray-900">{{ worker.firstName }} {{ worker.lastName }}</h3>
+                        <p class="text-sm text-gray-500">Farm Worker</p>
+                    </div>
+                </div>
+
+                <!-- Status Badge -->
+                <span class="px-2 py-1 rounded-full text-xs font-medium" [ngClass]="getStatusClass(worker.isActive)">
+                    <i [class]="getStatusIcon(worker.isActive) + ' mr-1'"></i>
+                    {{ worker.isActive ? 'Active' : 'Inactive' }}
+                </span>
+            </div>
+
+            <!-- Contact Information -->
+            <div class="space-y-3 mb-4">
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-envelope text-gray-400 w-4"></i>
+                    <span class="text-sm text-gray-600">{{ worker.email }}</span>
+                </div>
+                <div *ngIf="worker.phoneNumber" class="flex items-center space-x-2">
+                    <i class="fas fa-phone text-gray-400 w-4"></i>
+                    <span class="text-sm text-gray-600">{{ worker.phoneNumber }}</span>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-calendar text-gray-400 w-4"></i>
+                    <span class="text-sm text-gray-600">Joined: {{ formatDate(worker.createdAt) }}</span>
+                </div>
+            </div>
+
+            <!-- Performance Stats -->
+            <div class="bg-gray-50 rounded-lg p-3 mb-4">
+                <h4 class="text-sm font-medium text-gray-700 mb-2">Performance</h4>
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="text-center">
+                        <p class="text-lg font-bold text-green-600">{{ getWorkerStats(worker.id).tasksCompleted }}</p>
+                        <p class="text-xs text-gray-500">Tasks Done</p>
+                    </div>
+                    <div class="text-center">
+                        <p class="text-lg font-bold text-blue-600">{{ getWorkerStats(worker.id).attendanceRate }}%</p>
+                        <p class="text-xs text-gray-500">Attendance</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Last Activity -->
+            <div class="text-xs text-gray-500 mb-4">
+                <p>Username: {{ worker.username }}</p>
+                <p>Last active: {{ getWorkerStats(worker.id).lastActive | date:'shortDate' }}</p>
+            </div>
+
+            <!-- Actions -->
+            <div class="flex items-center justify-between pt-4 border-t border-gray-200">
+                <button (click)="toggleWorkerStatus(worker)" class="text-sm font-medium transition-colors"
+                    [ngClass]="worker.isActive ? 'text-red-600 hover:text-red-700' : 'text-green-600 hover:text-green-700'">
+                    <i [class]="worker.isActive ? 'fas fa-user-slash' : 'fas fa-user-check'" class="mr-1"></i>
+                    {{ worker.isActive ? 'Deactivate' : 'Activate' }}
+                </button>
+
+                <div class="flex items-center space-x-2">
+                    <button (click)="openTasks(worker)" class="text-blue-600 hover:text-blue-700 text-sm font-medium">
+                        <i class="fas fa-tasks mr-1"></i>
+                        Tasks
+                    </button>
+                    <button (click)="openChat(worker)" class="text-purple-600 hover:text-purple-700 text-sm font-medium">
+                        <i class="fas fa-comments mr-1"></i>
+                        Chat
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Summary Stats -->
+    <div *ngIf="!loading && workers.length > 0" class="mt-8 bg-white rounded-xl shadow-lg p-6 border border-gray-200">
+        <h3 class="text-lg font-semibold text-gray-900 mb-4">
+            <i class="fas fa-chart-bar mr-2 text-green-600"></i>
+            Team Overview
+        </h3>
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div class="text-center">
+                <div class="h-12 w-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                    <i class="fas fa-users text-green-600 text-xl"></i>
+                </div>
+                <p class="text-2xl font-bold text-gray-900">{{ workers.length }}</p>
+                <p class="text-sm text-gray-600">Total Workers</p>
+            </div>
+
+            <div class="text-center">
+                <div class="h-12 w-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                    <i class="fas fa-check-circle text-blue-600 text-xl"></i>
+                </div>
+                <p class="text-2xl font-bold text-gray-900">{{ getActiveWorkersCount() }}</p>
+                <p class="text-sm text-gray-600">Active Workers</p>
+            </div>
+
+            <div class="text-center">
+                <div class="h-12 w-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                    <i class="fas fa-tasks text-purple-600 text-xl"></i>
+                </div>
+                <p class="text-2xl font-bold text-gray-900">{{ getTotalTasksCompleted() }}</p>
+                <p class="text-sm text-gray-600">Total Tasks Completed</p>
+            </div>
+
+            <div class="text-center">
+                <div class="h-12 w-12 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                    <i class="fas fa-clock text-orange-600 text-xl"></i>
+                </div>
+                <p class="text-2xl font-bold text-gray-900">{{ getAverageAttendance() }}%</p>
+                <p class="text-sm text-gray-600">Average Attendance</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div *ngIf="!loading && workers.length > 0" class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+        <a routerLink="/dashboard/assign-tasks"
+            class="bg-gradient-to-r from-purple-500 to-purple-600 text-white p-4 rounded-xl hover:from-purple-600 hover:to-purple-700 transition-all duration-200 transform hover:scale-105 shadow-lg text-center">
+            <i class="fas fa-tasks text-2xl mb-2"></i>
+            <p class="font-semibold">Assign Tasks</p>
+            <p class="text-sm text-purple-100">Create and assign new tasks</p>
+        </a>
+
+        <a routerLink="/dashboard/attendance"
+            class="bg-gradient-to-r from-orange-500 to-orange-600 text-white p-4 rounded-xl hover:from-orange-600 hover:to-orange-700 transition-all duration-200 transform hover:scale-105 shadow-lg text-center">
+            <i class="fas fa-clock text-2xl mb-2"></i>
+            <p class="font-semibold">Monitor Attendance</p>
+            <p class="text-sm text-orange-100">View attendance records</p>
+        </a>
+
+        <a routerLink="/dashboard/chat"
+            class="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-4 rounded-xl hover:from-blue-600 hover:to-blue-700 transition-all duration-200 transform hover:scale-105 shadow-lg text-center">
+            <i class="fas fa-comments text-2xl mb-2"></i>
+            <p class="font-semibold">Team Chat</p>
+            <p class="text-sm text-blue-100">Communicate with workers</p>
+        </a>
+    </div>
+</div>
+
+<!-- Chat Modal -->
+<app-chat-modal
+  *ngIf="showChatModal && selectedWorker"
+  [isOpen]="showChatModal"
+  [recipientName]="selectedWorker.firstName + ' ' + selectedWorker.lastName"
+  [recipientId]="selectedWorker.id"
+  (closeModal)="closeChatModal()">
+</app-chat-modal>
+
+<!-- Worker Tasks Modal -->
+<app-worker-tasks-modal
+  *ngIf="showTasksModal && selectedWorker"
+  [isOpen]="showTasksModal"
+  [workerId]="selectedWorker.id"
+  [workerName]="selectedWorker.firstName + ' ' + selectedWorker.lastName"
+  (closeModal)="closeTasksModal()">
+</app-worker-tasks-modal>

@@ -1,0 +1,243 @@
+<div class="max-w-4xl mx-auto p-6">
+  <!-- Header -->
+  <div class="mb-8">
+    <div class="flex items-center space-x-4 mb-4">
+      <a routerLink="/dashboard" class="text-gray-500 hover:text-gray-700">
+        <i class="fas fa-arrow-left text-xl"></i>
+      </a>
+      <div>
+        <h1 class="text-3xl font-bold text-gray-900">Assign New Task</h1>
+        <p class="text-gray-600 mt-1">Create and assign tasks to your farm workers</p>
+      </div>
+    </div>
+    
+    <!-- Breadcrumb -->
+    <nav class="flex" aria-label="Breadcrumb">
+      <ol class="inline-flex items-center space-x-1 md:space-x-3">
+        <li class="inline-flex items-center">
+          <a routerLink="/dashboard" class="text-gray-500 hover:text-gray-700">Dashboard</a>
+        </li>
+        <li>
+          <div class="flex items-center">
+            <i class="fas fa-chevron-right text-gray-400 mx-2"></i>
+            <span class="text-gray-900 font-medium">Assign Task</span>
+          </div>
+        </li>
+      </ol>
+    </nav>
+  </div>
+
+  <!-- Form Card -->
+  <div class="bg-white rounded-2xl shadow-lg p-8 border border-gray-200">
+    <form [formGroup]="taskForm" (ngSubmit)="onSubmit()" class="space-y-8">
+      
+      <!-- Success Message -->
+      <div *ngIf="success" class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-xl flex items-center">
+        <i class="fas fa-check-circle mr-3 text-green-500"></i>
+        <span>{{ success }}</span>
+      </div>
+
+      <!-- Error Message -->
+      <div *ngIf="error" class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl flex items-center">
+        <i class="fas fa-exclamation-circle mr-3 text-red-500"></i>
+        <span>{{ error }}</span>
+      </div>
+
+      <!-- Task Information -->
+      <div class="space-y-6">
+        <h3 class="text-xl font-semibold text-gray-900 border-b border-gray-200 pb-3">
+          <i class="fas fa-tasks mr-2 text-purple-600"></i>
+          Task Details
+        </h3>
+
+        <!-- Task Title -->
+        <div class="space-y-2">
+          <label for="title" class="block text-sm font-medium text-gray-700">
+            Task Title *
+          </label>
+          <input
+            id="title"
+            type="text"
+            formControlName="title"
+            class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+            [class.border-red-300]="f['title'].invalid && f['title'].touched"
+            placeholder="Enter a clear, descriptive task title"
+          />
+          <div *ngIf="f['title'].invalid && f['title'].touched" class="text-red-600 text-sm">
+            <span *ngIf="f['title'].errors?.['required']">Task title is required</span>
+            <span *ngIf="f['title'].errors?.['minlength']">Task title must be at least 3 characters</span>
+          </div>
+        </div>
+
+        <!-- Task Description -->
+        <div class="space-y-2">
+          <label for="description" class="block text-sm font-medium text-gray-700">
+            Task Description *
+          </label>
+          <textarea
+            id="description"
+            formControlName="description"
+            rows="4"
+            class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+            [class.border-red-300]="f['description'].invalid && f['description'].touched"
+            placeholder="Provide detailed instructions for the task..."
+          ></textarea>
+          <div *ngIf="f['description'].invalid && f['description'].touched" class="text-red-600 text-sm">
+            <span *ngIf="f['description'].errors?.['required']">Task description is required</span>
+            <span *ngIf="f['description'].errors?.['minlength']">Description must be at least 10 characters</span>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Priority -->
+          <div class="space-y-2">
+            <label for="priority" class="block text-sm font-medium text-gray-700">
+              Priority *
+            </label>
+            <select
+              id="priority"
+              formControlName="priority"
+              class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              [class.border-red-300]="f['priority'].invalid && f['priority'].touched"
+            >
+              <option *ngFor="let priority of priorities" [value]="priority.value">
+                {{ priority.label }}
+              </option>
+            </select>
+            <div *ngIf="f['priority'].invalid && f['priority'].touched" class="text-red-600 text-sm">
+              <span>Please select task priority</span>
+            </div>
+          </div>
+
+          <!-- Estimated Hours -->
+          <div class="space-y-2">
+            <label for="estimatedHours" class="block text-sm font-medium text-gray-700">
+              Estimated Hours
+            </label>
+            <input
+              id="estimatedHours"
+              type="number"
+              formControlName="estimatedHours"
+              min="1"
+              max="24"
+              class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              placeholder="How many hours will this take?"
+            />
+            <p class="text-sm text-gray-500">Optional: Estimated time to complete this task</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Assignment Details -->
+      <div class="space-y-6">
+        <h3 class="text-xl font-semibold text-gray-900 border-b border-gray-200 pb-3">
+          <i class="fas fa-user-check mr-2 text-blue-600"></i>
+          Assignment Details
+        </h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Assign To -->
+          <div class="space-y-2">
+            <label for="assignedToId" class="block text-sm font-medium text-gray-700">
+              Assign to Worker *
+            </label>
+            <select
+              id="assignedToId"
+              formControlName="assignedToId"
+              class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              [class.border-red-300]="f['assignedToId'].invalid && f['assignedToId'].touched"
+            >
+              <option value="">Select a worker</option>
+              <option *ngFor="let worker of workers" [value]="worker.id">
+                {{ worker.firstName }} {{ worker.lastName }} - {{ worker.email }}
+              </option>
+            </select>
+            <div *ngIf="f['assignedToId'].invalid && f['assignedToId'].touched" class="text-red-600 text-sm">
+              <span>Please select a worker</span>
+            </div>
+            <div *ngIf="workers.length === 0" class="text-yellow-600 text-sm">
+              <i class="fas fa-exclamation-triangle mr-1"></i>
+              No active workers available. <a routerLink="/dashboard/add-worker" class="text-blue-600 hover:text-blue-700">Add workers first</a>
+            </div>
+          </div>
+
+          <!-- Due Date -->
+          <div class="space-y-2">
+            <label for="dueDate" class="block text-sm font-medium text-gray-700">
+              Due Date *
+            </label>
+            <input
+              id="dueDate"
+              type="date"
+              formControlName="dueDate"
+              class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              [class.border-red-300]="f['dueDate'].invalid && f['dueDate'].touched"
+            />
+            <div *ngIf="f['dueDate'].invalid && f['dueDate'].touched" class="text-red-600 text-sm">
+              <span>Please select a due date</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Assignment Preview -->
+        <div *ngIf="f['assignedToId'].value && f['priority'].value" class="bg-blue-50 border border-blue-200 rounded-xl p-4">
+          <h4 class="font-medium text-blue-900 mb-2">Assignment Preview</h4>
+          <div class="flex items-center space-x-3">
+            <div class="h-10 w-10 bg-blue-100 rounded-full flex items-center justify-center">
+              <i class="fas fa-user text-blue-600"></i>
+            </div>
+            <div>
+              <p class="font-medium text-blue-900">{{ getWorkerName(f['assignedToId'].value) }}</p>
+              <p class="text-sm text-blue-700">
+                Priority: <span [class]="getPriorityClass(f['priority'].value)">{{ f['priority'].value }}</span>
+                <span *ngIf="f['dueDate'].value"> | Due: {{ f['dueDate'].value | date:'mediumDate' }}</span>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Notification Settings -->
+      <div class="space-y-6">
+        <h3 class="text-xl font-semibold text-gray-900 border-b border-gray-200 pb-3">
+          <i class="fas fa-bell mr-2 text-green-600"></i>
+          Notification Settings
+        </h3>
+
+        <div class="bg-green-50 border border-green-200 rounded-xl p-4">
+          <div class="flex items-start space-x-3">
+            <i class="fas fa-info-circle text-green-600 mt-1"></i>
+            <div>
+              <h4 class="font-medium text-green-900 mb-1">Automatic Notifications</h4>
+              <ul class="text-sm text-green-800 space-y-1">
+                <li>• The assigned worker will receive an email notification</li>
+                <li>• Task details and due date will be included</li>
+                <li>• Worker can view task details in their dashboard</li>
+                <li>• You'll be notified when the task is completed</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex items-center justify-between pt-6 border-t border-gray-200">
+        <a routerLink="/dashboard" 
+           class="px-6 py-3 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 transition-colors">
+          <i class="fas fa-arrow-left mr-2"></i>
+          Cancel
+        </a>
+        
+        <button
+          type="submit"
+          [disabled]="loading || taskForm.invalid || workers.length === 0"
+          class="px-8 py-3 bg-gradient-to-r from-purple-600 to-purple-700 text-white font-semibold rounded-xl hover:from-purple-700 hover:to-purple-800 transition-all duration-200 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none shadow-lg"
+        >
+          <span *ngIf="loading" class="inline-block animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></span>
+          <i *ngIf="!loading" class="fas fa-paper-plane mr-2"></i>
+          {{ loading ? 'Assigning Task...' : 'Assign Task' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

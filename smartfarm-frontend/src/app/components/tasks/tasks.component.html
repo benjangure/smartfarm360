@@ -1,0 +1,230 @@
+<div class="space-y-6">
+  <!-- Header -->
+  <div class="flex items-center justify-between">
+    <div>
+      <h1 class="text-3xl font-bold text-gray-900">Tasks</h1>
+      <p class="text-gray-600 mt-1">Manage and track your farm tasks</p>
+    </div>
+    <button *ngIf="canCreateTasks()" 
+            (click)="openCreateModal()"
+            class="btn btn-primary">
+      <i class="fas fa-plus mr-2"></i>
+      Create Task
+    </button>
+  </div>
+
+  <!-- Filters -->
+  <div class="card p-6">
+    <div class="flex flex-col sm:flex-row gap-4">
+      <!-- Search -->
+      <div class="flex-1">
+        <label class="form-label">Search Tasks</label>
+        <div class="relative">
+          <input
+            type="text"
+            [(ngModel)]="searchTerm"
+            (input)="onSearchChange()"
+            placeholder="Search by title or description..."
+            class="form-input pl-10"
+          />
+          <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+        </div>
+      </div>
+
+      <!-- Status Filter -->
+      <div class="sm:w-48">
+        <label class="form-label">Filter by Status</label>
+        <select
+          [(ngModel)]="selectedStatus"
+          (change)="onStatusFilterChange()"
+          class="form-input"
+        >
+          <option value="ALL">All Status</option>
+          <option value="PENDING">Pending</option>
+          <option value="IN_PROGRESS">In Progress</option>
+          <option value="COMPLETED">Completed</option>
+          <option value="CANCELLED">Cancelled</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="flex items-center justify-center py-12">
+    <div class="spinner w-8 h-8"></div>
+    <span class="ml-2 text-gray-600">Loading tasks...</span>
+  </div>
+
+  <!-- Tasks Grid -->
+  <div *ngIf="!loading" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div *ngFor="let task of filteredTasks" 
+         class="card p-6 hover:shadow-md transition-shadow duration-200">
+      
+      <!-- Task Header -->
+      <div class="flex items-start justify-between mb-4">
+        <div class="flex-1">
+          <h3 class="text-lg font-semibold text-gray-900 mb-1">{{ task.title }}</h3>
+          <p class="text-sm text-gray-600" *ngIf="task.description">{{ task.description }}</p>
+        </div>
+        <span class="px-2 py-1 text-xs font-medium rounded-full"
+              [ngClass]="getStatusColor(task.status)">
+          {{ task.status }}
+        </span>
+      </div>
+
+      <!-- Task Details -->
+      <div class="space-y-2 mb-4">
+        <div class="flex items-center text-sm text-gray-600">
+          <i class="fas fa-user mr-2"></i>
+          <span>{{ task.assignedTo.firstName }} {{ task.assignedTo.lastName }}</span>
+        </div>
+        
+        <div class="flex items-center text-sm text-gray-600">
+          <i class="fas fa-flag mr-2" [ngClass]="getPriorityColor(task.priority)"></i>
+          <span>{{ task.priority }} Priority</span>
+        </div>
+        
+        <div *ngIf="task.dueDate" class="flex items-center text-sm text-gray-600">
+          <i class="fas fa-calendar mr-2"></i>
+          <span>Due: {{ task.dueDate | date:'short' }}</span>
+        </div>
+        
+        <div *ngIf="task.farm" class="flex items-center text-sm text-gray-600">
+          <i class="fas fa-seedling mr-2"></i>
+          <span>{{ task.farm.name }}</span>
+        </div>
+      </div>
+
+      <!-- Task Actions -->
+      <div class="flex gap-2" *ngIf="currentUser?.role === 'WORKER'">
+        <button *ngIf="canStartTask(task)"
+                (click)="startTask(task)"
+                class="flex-1 btn btn-primary text-sm">
+          <i class="fas fa-play mr-1"></i>
+          Start
+        </button>
+        
+        <button *ngIf="canCompleteTask(task)"
+                (click)="completeTask(task)"
+                class="flex-1 btn btn-success text-sm">
+          <i class="fas fa-check mr-1"></i>
+          Complete
+        </button>
+        
+        <button *ngIf="task.status === TaskStatus.COMPLETED"
+                disabled
+                class="flex-1 btn btn-secondary text-sm opacity-50 cursor-not-allowed">
+          <i class="fas fa-check-circle mr-1"></i>
+          Completed
+        </button>
+      </div>
+
+      <!-- Admin/Supervisor Actions -->
+      <div class="flex gap-2" *ngIf="currentUser?.role !== 'WORKER'">
+        <button class="flex-1 btn btn-secondary text-sm">
+          <i class="fas fa-edit mr-1"></i>
+          Edit
+        </button>
+        <button class="btn btn-danger text-sm">
+          <i class="fas fa-trash"></i>
+        </button>
+      </div>
+
+      <!-- Task Timeline -->
+      <div class="mt-4 pt-4 border-t border-gray-200" *ngIf="task.startedAt || task.completedAt">
+        <div class="text-xs text-gray-500 space-y-1">
+          <div *ngIf="task.startedAt">
+            <i class="fas fa-play mr-1"></i>
+            Started: {{ task.startedAt | date:'short' }}
+          </div>
+          <div *ngIf="task.completedAt">
+            <i class="fas fa-check mr-1"></i>
+            Completed: {{ task.completedAt | date:'short' }}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!loading && filteredTasks.length === 0" 
+       class="text-center py-12">
+    <i class="fas fa-tasks text-4xl text-gray-300 mb-4"></i>
+    <h3 class="text-lg font-medium text-gray-900 mb-2">No tasks found</h3>
+    <p class="text-gray-600">
+      {{ searchTerm || selectedStatus !== 'ALL' ? 'Try adjusting your filters' : 'No tasks have been created yet' }}
+    </p>
+  </div>
+</div>
+
+<!-- Create Task Modal -->
+<div *ngIf="showCreateModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+  <div class="bg-white rounded-lg p-6 w-full max-w-md mx-4">
+    <div class="flex items-center justify-between mb-4">
+      <h2 class="text-xl font-semibold">Create New Task</h2>
+      <button (click)="closeCreateModal()" class="text-gray-400 hover:text-gray-600">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+
+    <form [formGroup]="taskForm" (ngSubmit)="createTask()">
+      <div class="space-y-4">
+        <!-- Title -->
+        <div>
+          <label class="form-label">Task Title *</label>
+          <input type="text" formControlName="title" class="form-input" placeholder="Enter task title">
+        </div>
+
+        <!-- Description -->
+        <div>
+          <label class="form-label">Description</label>
+          <textarea formControlName="description" class="form-input" rows="3" placeholder="Task description (optional)"></textarea>
+        </div>
+
+        <!-- Assigned To -->
+        <div>
+          <label class="form-label">Assign To *</label>
+          <select formControlName="assignedToId" class="form-input">
+            <option value="">Select a worker</option>
+            <option *ngFor="let user of availableUsers" [value]="user.id">
+              {{ user.firstName }} {{ user.lastName }}
+            </option>
+          </select>
+        </div>
+
+        <!-- Priority -->
+        <div>
+          <label class="form-label">Priority *</label>
+          <select formControlName="priority" class="form-input">
+            <option value="LOW">Low</option>
+            <option value="MEDIUM">Medium</option>
+            <option value="HIGH">High</option>
+            <option value="URGENT">Urgent</option>
+          </select>
+        </div>
+
+        <!-- Due Date -->
+        <div>
+          <label class="form-label">Due Date</label>
+          <input type="datetime-local" formControlName="dueDate" class="form-input">
+        </div>
+
+        <!-- Estimated Hours -->
+        <div>
+          <label class="form-label">Estimated Hours</label>
+          <input type="number" formControlName="estimatedHours" class="form-input" min="0" step="0.5" placeholder="0">
+        </div>
+      </div>
+
+      <div class="flex gap-3 mt-6">
+        <button type="button" (click)="closeCreateModal()" class="flex-1 btn btn-secondary">
+          Cancel
+        </button>
+        <button type="submit" [disabled]="taskForm.invalid || submitting" class="flex-1 btn btn-primary">
+          <span *ngIf="submitting">Creating...</span>
+          <span *ngIf="!submitting">Create Task</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

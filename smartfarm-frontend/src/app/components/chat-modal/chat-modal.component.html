@@ -1,0 +1,88 @@
+<!-- Chat Modal -->
+<div *ngIf="isOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+  <div class="bg-white rounded-lg shadow-xl w-96 h-96 flex flex-col">
+    <!-- Header -->
+    <div class="bg-blue-600 text-white p-4 rounded-t-lg flex items-center justify-between">
+      <div class="flex items-center">
+        <i class="fas fa-comments mr-2"></i>
+        <h3 class="font-semibold">{{ recipientName }}</h3>
+      </div>
+      <div class="flex items-center space-x-2">
+        <div class="flex items-center" [class]="isConnected ? 'text-green-200' : 'text-red-200'">
+          <div class="w-2 h-2 rounded-full mr-1" [class]="isConnected ? 'bg-green-400' : 'bg-red-400'"></div>
+          <span class="text-xs">{{ isConnected ? 'Connected' : 'Disconnected' }}</span>
+        </div>
+        <button (click)="close()" class="text-white hover:text-gray-200 transition-colors">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="loading" class="flex-1 flex items-center justify-center">
+      <div class="text-center">
+        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
+        <p class="text-gray-600">Connecting to chat...</p>
+      </div>
+    </div>
+
+    <!-- Messages Container -->
+    <div *ngIf="!loading" #messagesContainer class="flex-1 overflow-y-auto p-4 space-y-3 bg-gray-50">
+      <!-- Empty State -->
+      <div *ngIf="messages.length === 0" class="text-center text-gray-500 py-8">
+        <i class="fas fa-comments text-3xl mb-2"></i>
+        <p>No messages yet</p>
+        <p class="text-sm">Start a conversation!</p>
+      </div>
+
+      <!-- Messages -->
+      <div *ngFor="let message of messages" 
+           class="flex" 
+           [class.justify-end]="isMyMessage(message)"
+           [class.justify-start]="!isMyMessage(message)">
+        <div class="max-w-xs">
+          <!-- Sender Info (for other's messages) -->
+          <div *ngIf="!isMyMessage(message)" class="text-xs text-gray-500 mb-1">
+            <span [class]="getRoleColor(message.sender.role)">
+              {{ message.sender.firstName }} {{ message.sender.lastName }}
+            </span>
+          </div>
+          
+          <!-- Message Bubble -->
+          <div class="rounded-lg px-3 py-2 text-sm"
+               [class]="isMyMessage(message) ? 'bg-blue-600 text-white' : 'bg-white text-gray-800 border'">
+            <p>{{ message.content }}</p>
+            <div class="text-xs mt-1 opacity-75">
+              {{ formatTime(message.createdAt) }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Message Input -->
+    <div *ngIf="!loading" class="p-4 border-t bg-white rounded-b-lg">
+      <div class="flex space-x-2">
+        <input
+          type="text"
+          [(ngModel)]="newMessage"
+          (keypress)="onKeyPress($event)"
+          placeholder="Type a message..."
+          class="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          [disabled]="!isConnected">
+        <button
+          (click)="sendMessage()"
+          [disabled]="!newMessage.trim() || !isConnected"
+          class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors">
+          <i class="fas fa-paper-plane"></i>
+        </button>
+      </div>
+      
+      <!-- Connection Status -->
+      <div *ngIf="!isConnected" class="text-xs text-red-600 mt-2 flex items-center">
+        <i class="fas fa-exclamation-triangle mr-1"></i>
+        Chat is disconnected. Messages cannot be sent.
+      </div>
+    </div>
+  </div>
+</div>

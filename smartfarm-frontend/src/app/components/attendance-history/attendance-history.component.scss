@@ -1,0 +1,22 @@
+/* Attendance History Styles */
+.attendance-table {
+  min-width: 800px;
+}
+
+.face-image-modal {
+  backdrop-filter: blur(4px);
+}
+
+.status-badge {
+  font-weight: 600;
+  letter-spacing: 0.025em;
+}
+
+.face-verification-btn {
+  transition: all 0.2s ease-in-out;
+}
+
+.face-verification-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}

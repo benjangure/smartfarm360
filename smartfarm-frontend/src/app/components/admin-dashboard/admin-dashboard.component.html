@@ -1,0 +1,244 @@
+<div class="p-6 space-y-6">
+  <!-- Header -->
+  <div class="flex items-center justify-between">
+    <div>
+      <h1 class="text-3xl font-bold text-gray-900">System Administration</h1>
+      <p class="text-gray-600 mt-1">Welcome back, {{ currentUser?.firstName }} {{ currentUser?.lastName }}</p>
+    </div>
+    <div class="flex items-center space-x-4">
+      <div class="bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm font-medium">
+        <i class="fas fa-crown mr-1"></i>
+        System Admin
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Actions -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <a routerLink="/dashboard/applications" 
+       class="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-6 rounded-xl hover:from-blue-600 hover:to-blue-700 transition-all duration-200 transform hover:scale-105 shadow-lg">
+      <div class="flex items-center justify-between">
+        <div>
+          <h3 class="text-lg font-semibold">Review Applications</h3>
+          <p class="text-blue-100 text-sm">{{ stats.pendingApplications }} pending</p>
+        </div>
+        <i class="fas fa-clipboard-list text-3xl text-blue-200"></i>
+      </div>
+    </a>
+
+    <a routerLink="/dashboard/farm-owners" 
+       class="bg-gradient-to-r from-green-500 to-green-600 text-white p-6 rounded-xl hover:from-green-600 hover:to-green-700 transition-all duration-200 transform hover:scale-105 shadow-lg">
+      <div class="flex items-center justify-between">
+        <div>
+          <h3 class="text-lg font-semibold">Farm Owners</h3>
+          <p class="text-green-100 text-sm">{{ stats.totalFarmOwners }} farm owners</p>
+        </div>
+        <i class="fas fa-user-tie text-3xl text-green-200"></i>
+      </div>
+    </a>
+
+    <div class="bg-gradient-to-r from-purple-500 to-purple-600 text-white p-6 rounded-xl shadow-lg">
+      <div class="flex items-center justify-between">
+        <div>
+          <h3 class="text-lg font-semibold">System Health</h3>
+          <p class="text-purple-100 text-sm">All systems operational</p>
+        </div>
+        <i class="fas fa-heartbeat text-3xl text-purple-200"></i>
+      </div>
+    </div>
+  </div>
+
+  <!-- Statistics Cards -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    <!-- Total Users -->
+    <div class="bg-white rounded-xl shadow-lg p-6 border border-gray-200">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-sm font-medium text-gray-600">Total Users</p>
+          <p class="text-3xl font-bold text-gray-900">{{ stats.totalUsers }}</p>
+          <p class="text-sm text-green-600 mt-1">
+            <i class="fas fa-arrow-up mr-1"></i>
+            +12% from last month
+          </p>
+        </div>
+        <div class="h-12 w-12 bg-blue-100 rounded-lg flex items-center justify-center">
+          <i class="fas fa-users text-blue-600 text-xl"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- Farm Owners -->
+    <div class="bg-white rounded-xl shadow-lg p-6 border border-gray-200">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-sm font-medium text-gray-600">Farm Owners</p>
+          <p class="text-3xl font-bold text-gray-900">{{ stats.totalFarmOwners }}</p>
+          <p class="text-sm text-green-600 mt-1">
+            <i class="fas fa-arrow-up mr-1"></i>
+            +3 this week
+          </p>
+        </div>
+        <div class="h-12 w-12 bg-purple-100 rounded-lg flex items-center justify-center">
+          <i class="fas fa-user-tie text-purple-600 text-xl"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- Active Farms -->
+    <div class="bg-white rounded-xl shadow-lg p-6 border border-gray-200">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-sm font-medium text-gray-600">Active Farms</p>
+          <p class="text-3xl font-bold text-gray-900">{{ stats.activeFarms }}</p>
+          <p class="text-sm text-green-600 mt-1">
+            <i class="fas fa-arrow-up mr-1"></i>
+            +5 this month
+          </p>
+        </div>
+        <div class="h-12 w-12 bg-green-100 rounded-lg flex items-center justify-center">
+          <i class="fas fa-seedling text-green-600 text-xl"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pending Applications -->
+    <div class="bg-white rounded-xl shadow-lg p-6 border border-gray-200">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-sm font-medium text-gray-600">Pending Applications</p>
+          <p class="text-3xl font-bold text-gray-900">{{ stats.pendingApplications }}</p>
+          <p class="text-sm text-orange-600 mt-1">
+            <i class="fas fa-clock mr-1"></i>
+            Requires attention
+          </p>
+        </div>
+        <div class="h-12 w-12 bg-orange-100 rounded-lg flex items-center justify-center">
+          <i class="fas fa-clipboard-list text-orange-600 text-xl"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- User Distribution Chart -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <!-- User Roles Distribution -->
+    <div class="bg-white rounded-xl shadow-lg p-6 border border-gray-200">
+      <h3 class="text-lg font-semibold text-gray-900 mb-4">User Roles Distribution</h3>
+      <div class="space-y-4">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center">
+            <div class="h-4 w-4 bg-purple-500 rounded mr-3"></div>
+            <span class="text-gray-700">Farm Owners</span>
+          </div>
+          <div class="flex items-center">
+            <span class="text-gray-900 font-semibold mr-2">{{ stats.totalFarmOwners }}</span>
+            <div class="w-24 bg-gray-200 rounded-full h-2">
+              <div class="bg-purple-500 h-2 rounded-full" [style.width.%]="(stats.totalFarmOwners / stats.totalUsers) * 100"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-between">
+          <div class="flex items-center">
+            <div class="h-4 w-4 bg-blue-500 rounded mr-3"></div>
+            <span class="text-gray-700">Supervisors</span>
+          </div>
+          <div class="flex items-center">
+            <span class="text-gray-900 font-semibold mr-2">{{ stats.totalSupervisors }}</span>
+            <div class="w-24 bg-gray-200 rounded-full h-2">
+              <div class="bg-blue-500 h-2 rounded-full" [style.width.%]="(stats.totalSupervisors / stats.totalUsers) * 100"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-between">
+          <div class="flex items-center">
+            <div class="h-4 w-4 bg-green-500 rounded mr-3"></div>
+            <span class="text-gray-700">Workers</span>
+          </div>
+          <div class="flex items-center">
+            <span class="text-gray-900 font-semibold mr-2">{{ stats.totalWorkers }}</span>
+            <div class="w-24 bg-gray-200 rounded-full h-2">
+              <div class="bg-green-500 h-2 rounded-full" [style.width.%]="(stats.totalWorkers / stats.totalUsers) * 100"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- System Status -->
+    <div class="bg-white rounded-xl shadow-lg p-6 border border-gray-200">
+      <h3 class="text-lg font-semibold text-gray-900 mb-4">System Status</h3>
+      <div class="space-y-4">
+        <div class="flex items-center justify-between p-3 bg-green-50 rounded-lg">
+          <div class="flex items-center">
+            <div class="h-8 w-8 bg-green-100 rounded-full flex items-center justify-center">
+              <i class="fas fa-server text-green-600 text-sm"></i>
+            </div>
+            <div class="ml-3">
+              <p class="text-sm font-medium text-gray-900">Database</p>
+              <p class="text-xs text-gray-500">Connected</p>
+            </div>
+          </div>
+          <span class="text-green-600 font-semibold">Online</span>
+        </div>
+
+        <div class="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
+          <div class="flex items-center">
+            <div class="h-8 w-8 bg-blue-100 rounded-full flex items-center justify-center">
+              <i class="fas fa-cloud text-blue-600 text-sm"></i>
+            </div>
+            <div class="ml-3">
+              <p class="text-sm font-medium text-gray-900">API Services</p>
+              <p class="text-xs text-gray-500">All endpoints responding</p>
+            </div>
+          </div>
+          <span class="text-blue-600 font-semibold">Active</span>
+        </div>
+
+        <div class="flex items-center justify-between p-3 bg-purple-50 rounded-lg">
+          <div class="flex items-center">
+            <div class="h-8 w-8 bg-purple-100 rounded-full flex items-center justify-center">
+              <i class="fas fa-shield-alt text-purple-600 text-sm"></i>
+            </div>
+            <div class="ml-3">
+              <p class="text-sm font-medium text-gray-900">Security</p>
+              <p class="text-xs text-gray-500">All systems secure</p>
+            </div>
+          </div>
+          <span class="text-purple-600 font-semibold">Protected</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- System Overview -->
+  <div class="bg-white rounded-xl shadow-lg p-6 border border-gray-200">
+    <h3 class="text-lg font-semibold text-gray-900 mb-4">System Overview</h3>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div class="text-center">
+        <div class="h-16 w-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
+          <i class="fas fa-tasks text-blue-600 text-2xl"></i>
+        </div>
+        <p class="text-2xl font-bold text-gray-900">{{ stats.totalTasks }}</p>
+        <p class="text-sm text-gray-600">Total Tasks</p>
+      </div>
+
+      <div class="text-center">
+        <div class="h-16 w-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
+          <i class="fas fa-clock text-green-600 text-2xl"></i>
+        </div>
+        <p class="text-2xl font-bold text-gray-900">{{ stats.totalAttendanceRecords }}</p>
+        <p class="text-sm text-gray-600">Attendance Records</p>
+      </div>
+
+      <div class="text-center">
+        <div class="h-16 w-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-3">
+          <i class="fas fa-chart-line text-purple-600 text-2xl"></i>
+        </div>
+        <p class="text-2xl font-bold text-gray-900">98.5%</p>
+        <p class="text-sm text-gray-600">System Uptime</p>
+      </div>
+    </div>
+  </div>
+</div>

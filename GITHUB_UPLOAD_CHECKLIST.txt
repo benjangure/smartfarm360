@@ -1,0 +1,55 @@
+SmartFarm360 - GitHub Upload Checklist
+======================================
+
+BEFORE UPLOADING:
+-----------------
+
+1. Clean up temporary files:
+   - Delete all *-check*.sql, *-fix*.sql, *-test*.sql files
+   - Delete all *_SUMMARY.md, *_DOCUMENTATION.md files
+   - Delete *.ps1 PowerShell scripts
+   - Keep only: setup-database.sql
+
+2. Secure sensitive information:
+   - Check application.yml has placeholders for passwords
+   - No real email credentials
+   - No real database passwords
+   - JWT secret is generic
+
+3. Keep only these documentation files:
+   - README.md
+   - LICENSE
+   - .gitignore
+   - SETUP_GUIDE.md
+
+4. Demo user to keep:
+   - System Admin: sysadmin / admin123
+   - (Others will be created through the app)
+
+UPLOAD TO GITHUB:
+-----------------
+
+1. Initialize git:
+   git init
+   git add .
+   git commit -m "Initial commit: SmartFarm360"
+
+2. Create repository on GitHub:
+   - Name: smartfarm360
+   - Description: Modern Farm Management System
+   - Public or Private
+
+3. Push to GitHub:
+   git remote add origin https://github.com/yourusername/smartfarm360.git
+   git branch -M main
+   git push -u origin main
+
+AFTER UPLOAD:
+-------------
+
+1. Add topics: farm-management, spring-boot, angular, agriculture
+2. Verify README displays correctly
+3. Test cloning on fresh machine
+4. Update any missing information
+
+DONE! Your project is on GitHub! 🚀

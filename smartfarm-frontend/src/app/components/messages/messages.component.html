@@ -1,0 +1,197 @@
+<div class="max-w-7xl mx-auto p-6">
+  <!-- Header -->
+  <div class="flex items-center justify-between mb-8">
+    <div>
+      <h1 class="text-3xl font-bold text-gray-900">Messages</h1>
+      <p class="text-gray-600 mt-1">Communicate with your team members</p>
+    </div>
+    <button 
+      (click)="openNewChatModal()"
+      class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl transition-colors">
+      <i class="fas fa-plus mr-2"></i>
+      New Message
+    </button>
+  </div>
+
+  <!-- Breadcrumb -->
+  <nav class="flex mb-6" aria-label="Breadcrumb">
+    <ol class="inline-flex items-center space-x-1 md:space-x-3">
+      <li class="inline-flex items-center">
+        <a routerLink="/dashboard" class="text-gray-500 hover:text-gray-700">Dashboard</a>
+      </li>
+      <li>
+        <div class="flex items-center">
+          <i class="fas fa-chevron-right text-gray-400 mx-2"></i>
+          <span class="text-gray-900 font-medium">Messages</span>
+        </div>
+      </li>
+    </ol>
+  </nav>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="flex items-center justify-center py-12">
+    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+    <span class="ml-3 text-gray-600">Loading conversations...</span>
+  </div>
+
+  <!-- Messages Content -->
+  <div *ngIf="!loading" class="bg-white rounded-xl shadow-lg border border-gray-200">
+    
+    <!-- Empty State -->
+    <div *ngIf="conversations.length === 0" class="text-center py-16">
+      <div class="mx-auto h-24 w-24 bg-blue-100 rounded-full flex items-center justify-center mb-6">
+        <i class="fas fa-comments text-blue-600 text-3xl"></i>
+      </div>
+      <h3 class="text-xl font-semibold text-gray-900 mb-2">No Conversations Yet</h3>
+      <p class="text-gray-600 mb-6">Start a conversation by sending a message to a team member</p>
+      <div class="text-sm text-gray-500">
+        <p class="mb-2">You can send messages to:</p>
+        <div class="flex justify-center space-x-4">
+          <span *ngIf="currentUser?.role === 'WORKER'" class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full">
+            <i class="fas fa-user-tie mr-1"></i>
+            Supervisors
+          </span>
+          <span *ngIf="currentUser?.role === 'SUPERVISOR'" class="px-3 py-1 bg-purple-100 text-purple-800 rounded-full">
+            <i class="fas fa-home mr-1"></i>
+            Farm Owners
+          </span>
+          <span *ngIf="currentUser?.role === 'FARM_OWNER'" class="px-3 py-1 bg-red-100 text-red-800 rounded-full">
+            <i class="fas fa-crown mr-1"></i>
+            System Admins
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Conversations List -->
+    <div *ngIf="conversations.length > 0" class="divide-y divide-gray-200">
+      <div class="px-6 py-4 bg-gray-50 border-b border-gray-200">
+        <h3 class="text-lg font-semibold text-gray-900">
+          <i class="fas fa-inbox mr-2 text-blue-600"></i>
+          Your Conversations ({{ conversations.length }})
+        </h3>
+      </div>
+
+      <div *ngFor="let conversation of conversations" 
+           (click)="openChat(conversation)"
+           class="px-6 py-4 hover:bg-gray-50 cursor-pointer transition-colors duration-200">
+        
+        <div class="flex items-center space-x-4">
+          <!-- Avatar -->
+          <div class="relative">
+            <div [class]="getRoleColor(conversation.participant?.role)" 
+                 class="h-12 w-12 rounded-full flex items-center justify-center">
+              <i [class]="getRoleIcon(conversation.participant?.role)" class="text-lg"></i>
+            </div>
+            
+            <!-- Unread indicator -->
+            <span *ngIf="conversation.unreadCount > 0" 
+                  class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold">
+              {{ conversation.unreadCount > 9 ? '9+' : conversation.unreadCount }}
+            </span>
+          </div>
+
+          <!-- Conversation Details -->
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center space-x-2">
+                <h4 class="text-lg font-semibold text-gray-900">
+                  {{ conversation.participant?.firstName }} {{ conversation.participant?.lastName }}
+                </h4>
+                <span [class]="getRoleColor(conversation.participant?.role)" 
+                      class="px-2 py-1 text-xs font-medium rounded-full">
+                  {{ conversation.participant?.role?.replace('_', ' ') }}
+                </span>
+              </div>
+              <span class="text-sm text-gray-500">{{ formatTime(conversation.lastMessageTime) }}</span>
+            </div>
+            
+            <p class="text-gray-600 truncate mt-1 text-sm">
+              <i class="fas fa-comment-dots mr-1 text-gray-400"></i>
+              {{ conversation.lastMessage }}
+            </p>
+            
+            <div class="flex items-center justify-between mt-2">
+              <span class="text-xs text-gray-500">
+                <i class="fas fa-envelope mr-1"></i>
+                {{ conversation.participant?.email }}
+              </span>
+              
+              <div class="flex items-center space-x-2">
+                <span *ngIf="conversation.unreadCount > 0" 
+                      class="text-xs font-medium text-blue-600">
+                  {{ conversation.unreadCount }} new message{{ conversation.unreadCount > 1 ? 's' : '' }}
+                </span>
+                <i class="fas fa-chevron-right text-gray-400"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Actions -->
+  <div *ngIf="!loading" class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div class="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-4 rounded-xl text-center">
+      <i class="fas fa-users text-2xl mb-2"></i>
+      <p class="font-semibold">Team Communication</p>
+      <p class="text-sm text-blue-100">Stay connected with your team</p>
+    </div>
+
+    <div class="bg-gradient-to-r from-green-500 to-green-600 text-white p-4 rounded-xl text-center">
+      <i class="fas fa-bell text-2xl mb-2"></i>
+      <p class="font-semibold">Real-time Notifications</p>
+      <p class="text-sm text-green-100">Get notified of new messages</p>
+    </div>
+
+    <div class="bg-gradient-to-r from-purple-500 to-purple-600 text-white p-4 rounded-xl text-center">
+      <i class="fas fa-history text-2xl mb-2"></i>
+      <p class="font-semibold">Message History</p>
+      <p class="text-sm text-purple-100">Access all your conversations</p>
+    </div>
+  </div>
+</div>
+
+<!-- Chat Modal -->
+<app-chat-modal
+  *ngIf="showChatModal && selectedConversation"
+  [isOpen]="showChatModal"
+  [recipientName]="selectedConversation.participant?.firstName + ' ' + selectedConversation.participant?.lastName"
+  [recipientId]="selectedConversation.participant?.id"
+  (closeModal)="closeChatModal()">
+</app-chat-modal>
+
+<!-- New Chat Modal -->
+<div *ngIf="showNewChatModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+  <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+    <div class="mt-3">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-lg font-medium text-gray-900">Start New Conversation</h3>
+        <button (click)="closeNewChatModal()" class="text-gray-400 hover:text-gray-600">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      
+      <div class="space-y-3">
+        <div *ngFor="let contact of availableContacts" 
+             (click)="openNewChat(contact)"
+             class="flex items-center p-3 hover:bg-gray-50 rounded-lg cursor-pointer transition-colors">
+          <div [class]="getRoleColor(contact.role)" 
+               class="h-10 w-10 rounded-full flex items-center justify-center mr-3">
+            <i [class]="getRoleIcon(contact.role)" class="text-sm"></i>
+          </div>
+          <div>
+            <p class="font-medium text-gray-900">{{ contact.firstName }} {{ contact.lastName }}</p>
+            <p class="text-sm text-gray-500">{{ contact.role.replace('_', ' ') }} • {{ contact.email }}</p>
+          </div>
+        </div>
+        
+        <div *ngIf="availableContacts.length === 0" class="text-center py-4 text-gray-500">
+          <i class="fas fa-users text-2xl mb-2"></i>
+          <p>No contacts available</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

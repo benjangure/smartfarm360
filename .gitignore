@@ -1,0 +1,143 @@
+# Compiled class files
+*.class
+
+# Log files
+*.log
+
+# BlueJ files
+*.ctxt
+
+# Mobile Tools for Java (J2ME)
+.mtj.tmp/
+
+# Package Files
+*.jar
+*.war
+*.nar
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+# Virtual machine crash logs
+hs_err_pid*
+
+# Maven
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar
+
+# Gradle
+.gradle
+build/
+
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.pnpm-debug.log*
+
+# Angular
+dist/
+tmp/
+out-tsc/
+bazel-out/
+.angular/
+
+# IDEs
+.idea/
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Application configuration (contains sensitive data)
+**/application.yml
+**/application.properties
+**/application-*.yml
+**/application-*.properties
+
+# Keep example configs
+!**/application.yml.example
+!**/application.properties.example
+
+# Exclude sensitive files
+smartfarm-backend/src/main/resources/application.yml
+
+# Database
+*.sql.backup
+*.db
+
+# Uploads
+uploads/
+temp/
+
+# Temporary files
+*.tmp
+*.bak
+*.swp
+*~.nib
+
+# Test files
+test-*.ps1
+test-*.bat
+debug-*.ps1
+debug-*.html
+create-test-*.ps1
+
+# Development documentation (keep only essential docs)
+*_SUMMARY.md
+*_FIX*.md
+*_IMPROVEMENTS*.md
+PHASE_*.md
+verify-*.md
+simple-instructions.md
+
+# SQL test/debug files
+add-*.sql
+check-*.sql
+fix-*.sql
+quick-*.sql
+simple-*.sql
+test-*.sql
+update-*.sql
+verify-*.sql
+
+# Batch files (except essential ones)
+compile-and-run.bat
+test-*.bat
+start-with-email.bat
+
+# Kiro IDE
+.kiro/
+
+# Logs
+logs/
+*.log
+
+# Spring Boot
+spring-boot-*.log

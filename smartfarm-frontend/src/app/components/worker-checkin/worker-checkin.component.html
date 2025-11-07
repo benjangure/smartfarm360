@@ -1,0 +1,101 @@
+<div class="worker-checkin">
+  <div class="header">
+    <h2>Check In / Check Out</h2>
+    <div class="current-time">
+      <i class="fas fa-clock"></i>
+      {{ currentTime | date:'fullDate' }} - {{ currentTime | date:'mediumTime' }}
+    </div>
+  </div>
+
+  <div class="alert alert-error" *ngIf="error">
+    <i class="fas fa-exclamation-triangle"></i>
+    {{ error }}
+  </div>
+
+  <div class="alert alert-success" *ngIf="success">
+    <i class="fas fa-check-circle"></i>
+    {{ success }}
+  </div>
+
+  <div class="status-card">
+    <div class="status-header">
+      <h3>Today's Status</h3>
+      <div class="status-indicator" [class]="isCheckedIn ? 'checked-in' : 'checked-out'">
+        <i [class]="isCheckedIn ? 'fas fa-user-check' : 'fas fa-user-clock'"></i>
+        {{ isCheckedIn ? 'Checked In' : 'Checked Out' }}
+      </div>
+    </div>
+
+    <div class="time-display">
+      <div class="time-item">
+        <label>Check In Time</label>
+        <div class="time-value">
+          <i class="fas fa-sign-in-alt"></i>
+          {{ formatTime(checkInTime) }}
+        </div>
+      </div>
+
+      <div class="time-item">
+        <label>Check Out Time</label>
+        <div class="time-value">
+          <i class="fas fa-sign-out-alt"></i>
+          {{ formatTime(checkOutTime) }}
+        </div>
+      </div>
+
+      <div class="time-item">
+        <label>Working Hours</label>
+        <div class="time-value working-hours">
+          <i class="fas fa-clock"></i>
+          {{ getWorkingHours() }}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="action-card">
+    <div class="notes-section">
+      <label for="notes">Notes (Optional)</label>
+      <textarea 
+        id="notes"
+        [(ngModel)]="notes" 
+        placeholder="Add any notes about your work day..."
+        rows="3"
+        class="notes-input">
+      </textarea>
+    </div>
+
+    <div class="action-buttons">
+      <button 
+        *ngIf="!isCheckedIn"
+        (click)="checkIn()"
+        [disabled]="loading"
+        class="btn btn-check-in">
+        <i class="fas fa-sign-in-alt" [class.spinning]="loading"></i>
+        {{ loading ? 'Checking In...' : 'Check In' }}
+      </button>
+
+      <button 
+        *ngIf="isCheckedIn"
+        (click)="checkOut()"
+        [disabled]="loading"
+        class="btn btn-check-out">
+        <i class="fas fa-sign-out-alt" [class.spinning]="loading"></i>
+        {{ loading ? 'Checking Out...' : 'Check Out' }}
+      </button>
+    </div>
+  </div>
+
+  <div class="info-card">
+    <h4>
+      <i class="fas fa-info-circle"></i>
+      Important Information
+    </h4>
+    <ul>
+      <li>Please check in when you arrive at the farm</li>
+      <li>Check out when you finish your work for the day</li>
+      <li>Add notes about any important events or observations</li>
+      <li>Your attendance is automatically tracked for payroll</li>
+    </ul>
+  </div>
+</div>

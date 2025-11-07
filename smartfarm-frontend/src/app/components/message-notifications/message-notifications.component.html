@@ -1,0 +1,94 @@
+<div class="relative">
+  <!-- Notification Bell -->
+  <button 
+    (click)="toggleNotifications()"
+    class="relative p-2 text-gray-600 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-lg">
+    <i class="fas fa-bell text-xl"></i>
+    
+    <!-- Unread Count Badge -->
+    <span *ngIf="unreadCount > 0" 
+          class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold">
+      {{ unreadCount > 9 ? '9+' : unreadCount }}
+    </span>
+  </button>
+
+  <!-- Notifications Dropdown -->
+  <div *ngIf="showNotifications" 
+       class="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-xl border border-gray-200 z-50">
+    
+    <!-- Header -->
+    <div class="px-4 py-3 border-b border-gray-200">
+      <div class="flex items-center justify-between">
+        <h3 class="text-lg font-semibold text-gray-900">Messages</h3>
+        <span class="text-sm text-gray-500">{{ unreadCount }} unread</span>
+      </div>
+    </div>
+
+    <!-- Conversations List -->
+    <div class="max-h-96 overflow-y-auto">
+      <div *ngIf="conversations.length === 0" class="px-4 py-8 text-center text-gray-500">
+        <i class="fas fa-comments text-3xl mb-2"></i>
+        <p>No messages yet</p>
+      </div>
+
+      <div *ngFor="let conversation of conversations" 
+           (click)="openChat(conversation)"
+           class="px-4 py-3 hover:bg-gray-50 cursor-pointer border-b border-gray-100 last:border-b-0">
+        
+        <div class="flex items-start space-x-3">
+          <!-- Avatar -->
+          <div class="h-10 w-10 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+            <i class="fas fa-user text-blue-600"></i>
+          </div>
+
+          <!-- Message Content -->
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center justify-between">
+              <p class="text-sm font-medium text-gray-900 truncate">
+                {{ conversation.participant?.firstName }} {{ conversation.participant?.lastName }}
+              </p>
+              <p class="text-xs text-gray-500">{{ formatTime(conversation.lastMessageTime) }}</p>
+            </div>
+            
+            <p class="text-sm text-gray-600 truncate mt-1">{{ conversation.lastMessage }}</p>
+            
+            <div class="flex items-center justify-between mt-1">
+              <span [class]="getRoleColor(conversation.participant?.role)" 
+                    class="text-xs font-medium">
+                {{ conversation.participant?.role?.replace('_', ' ') }}
+              </span>
+              
+              <span *ngIf="conversation.unreadCount > 0" 
+                    class="bg-blue-500 text-white text-xs rounded-full px-2 py-1 font-bold">
+                {{ conversation.unreadCount }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="px-4 py-3 border-t border-gray-200">
+      <button 
+        routerLink="/dashboard/messages"
+        class="w-full text-center text-sm text-blue-600 hover:text-blue-700 font-medium">
+        View All Messages
+      </button>
+    </div>
+  </div>
+
+  <!-- Overlay to close dropdown -->
+  <div *ngIf="showNotifications" 
+       (click)="toggleNotifications()"
+       class="fixed inset-0 z-40"></div>
+</div>
+
+<!-- Chat Modal -->
+<app-chat-modal
+  *ngIf="showChatModal && selectedConversation"
+  [isOpen]="showChatModal"
+  [recipientName]="selectedConversation.participant?.firstName + ' ' + selectedConversation.participant?.lastName"
+  [recipientId]="selectedConversation.participant?.id"
+  (closeModal)="closeChatModal()">
+</app-chat-modal>

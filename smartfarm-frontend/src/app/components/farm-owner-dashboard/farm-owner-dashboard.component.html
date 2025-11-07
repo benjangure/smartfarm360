@@ -1,0 +1,236 @@
+<div class="p-6 space-y-6">
+  <!-- Header -->
+  <div class="flex items-center justify-between">
+    <div>
+      <h1 class="text-3xl font-bold text-gray-900">Farm Owner Dashboard</h1>
+      <p class="text-gray-600 mt-1">{{ getGreeting() }}, {{ currentUser?.firstName }}! Manage your farming operations</p>
+    </div>
+    <div class="flex items-center space-x-4">
+      <div class="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm font-medium">
+        <i class="fas fa-user-tie mr-1"></i>
+        Farm Owner
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Actions -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <a routerLink="/dashboard/farms" 
+       class="bg-gradient-to-r from-green-500 to-green-600 text-white p-6 rounded-xl hover:from-green-600 hover:to-green-700 transition-all duration-200 transform hover:scale-105 shadow-lg">
+      <div class="flex items-center justify-between">
+        <div>
+          <h3 class="text-lg font-semibold">Manage Farms</h3>
+          <p class="text-green-100 text-sm">{{ stats.totalFarms }} farms</p>
+        </div>
+        <i class="fas fa-seedling text-3xl text-green-200"></i>
+      </div>
+    </a>
+
+    <a routerLink="/dashboard/supervisors" 
+       class="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-6 rounded-xl hover:from-blue-600 hover:to-blue-700 transition-all duration-200 transform hover:scale-105 shadow-lg">
+      <div class="flex items-center justify-between">
+        <div>
+          <h3 class="text-lg font-semibold">My Supervisors</h3>
+          <p class="text-blue-100 text-sm">{{ stats.totalSupervisors }} supervisors</p>
+        </div>
+        <i class="fas fa-user-cog text-3xl text-blue-200"></i>
+      </div>
+    </a>
+
+    <a routerLink="/dashboard/add-supervisor" 
+       class="bg-gradient-to-r from-purple-500 to-purple-600 text-white p-6 rounded-xl hover:from-purple-600 hover:to-purple-700 transition-all duration-200 transform hover:scale-105 shadow-lg">
+      <div class="flex items-center justify-between">
+        <div>
+          <h3 class="text-lg font-semibold">Add Supervisor</h3>
+          <p class="text-purple-100 text-sm">Onboard new team member</p>
+        </div>
+        <i class="fas fa-user-plus text-3xl text-purple-200"></i>
+      </div>
+    </a>
+  </div>
+
+  <!-- Statistics Cards -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    <!-- Total Farms -->
+    <div class="bg-white rounded-xl shadow-lg p-6 border border-gray-200">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-sm font-medium text-gray-600">My Farms</p>
+          <p class="text-3xl font-bold text-gray-900">{{ stats.totalFarms }}</p>
+          <p class="text-sm text-green-600 mt-1">
+            <i class="fas fa-arrow-up mr-1"></i>
+            Active operations
+          </p>
+        </div>
+        <div class="h-12 w-12 bg-green-100 rounded-lg flex items-center justify-center">
+          <i class="fas fa-seedling text-green-600 text-xl"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- Total Supervisors -->
+    <div class="bg-white rounded-xl shadow-lg p-6 border border-gray-200">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-sm font-medium text-gray-600">Supervisors</p>
+          <p class="text-3xl font-bold text-gray-900">{{ stats.totalSupervisors }}</p>
+          <p class="text-sm text-blue-600 mt-1">
+            <i class="fas fa-users mr-1"></i>
+            Team leaders
+          </p>
+        </div>
+        <div class="h-12 w-12 bg-blue-100 rounded-lg flex items-center justify-center">
+          <i class="fas fa-user-cog text-blue-600 text-xl"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- Total Workers -->
+    <div class="bg-white rounded-xl shadow-lg p-6 border border-gray-200">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-sm font-medium text-gray-600">Workers</p>
+          <p class="text-3xl font-bold text-gray-900">{{ stats.totalWorkers }}</p>
+          <p class="text-sm text-purple-600 mt-1">
+            <i class="fas fa-hard-hat mr-1"></i>
+            Field workers
+          </p>
+        </div>
+        <div class="h-12 w-12 bg-purple-100 rounded-lg flex items-center justify-center">
+          <i class="fas fa-hard-hat text-purple-600 text-xl"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- Assigned to Farms -->
+    <div class="bg-white rounded-xl shadow-lg p-6 border border-gray-200">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-sm font-medium text-gray-600">Assigned to Farms</p>
+          <p class="text-3xl font-bold text-gray-900">{{ stats.assignedSupervisors }}</p>
+          <p class="text-sm text-green-600 mt-1">
+            <i class="fas fa-check-circle mr-1"></i>
+            Supervisors assigned
+          </p>
+        </div>
+        <div class="h-12 w-12 bg-green-100 rounded-lg flex items-center justify-center">
+          <i class="fas fa-user-check text-green-600 text-xl"></i>
+        </div>
+      </div>
+      <button 
+        (click)="viewAssignedSupervisors()"
+        class="mt-3 w-full text-sm text-green-600 hover:text-green-700 font-medium transition-colors">
+        <i class="fas fa-eye mr-1"></i>
+        View Details
+      </button>
+    </div>
+  </div>
+
+  <!-- Recent Activity -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <!-- Recent Farms -->
+    <div class="bg-white rounded-xl shadow-lg p-6 border border-gray-200">
+      <h3 class="text-lg font-semibold text-gray-900 mb-4">
+        <i class="fas fa-seedling mr-2 text-green-600"></i>
+        My Farms
+      </h3>
+      <div *ngIf="loading" class="flex items-center justify-center py-8">
+        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div>
+      </div>
+      <div *ngIf="!loading && recentFarms.length === 0" class="text-center py-8">
+        <i class="fas fa-seedling text-gray-300 text-4xl mb-4"></i>
+        <p class="text-gray-500">No farms added yet</p>
+        <a routerLink="/dashboard/farms" class="text-green-600 hover:text-green-700 font-medium">
+          Add your first farm
+        </a>
+      </div>
+      <div *ngIf="!loading && recentFarms.length > 0" class="space-y-4">
+        <div *ngFor="let farm of recentFarms" class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+          <div class="flex items-center space-x-3">
+            <div class="h-10 w-10 bg-green-100 rounded-full flex items-center justify-center">
+              <i class="fas fa-seedling text-green-600"></i>
+            </div>
+            <div>
+              <p class="font-medium text-gray-900">{{ farm.name }}</p>
+              <p class="text-sm text-gray-500">{{ farm.location }}</p>
+            </div>
+          </div>
+          <div class="text-right">
+            <p class="text-sm font-medium text-gray-900">{{ farm.size }} {{ farm.sizeUnit }}</p>
+            <p class="text-xs text-gray-500">{{ farm.createdAt | date:'shortDate' }}</p>
+          </div>
+        </div>
+        <a routerLink="/dashboard/farms" class="block text-center text-green-600 hover:text-green-700 font-medium py-2">
+          View all farms →
+        </a>
+      </div>
+    </div>
+
+    <!-- Recent Supervisors -->
+    <div class="bg-white rounded-xl shadow-lg p-6 border border-gray-200">
+      <h3 class="text-lg font-semibold text-gray-900 mb-4">
+        <i class="fas fa-user-cog mr-2 text-blue-600"></i>
+        Recent Supervisors
+      </h3>
+      <div *ngIf="recentSupervisors.length === 0" class="text-center py-8">
+        <i class="fas fa-user-cog text-gray-300 text-4xl mb-4"></i>
+        <p class="text-gray-500">No supervisors added yet</p>
+        <a routerLink="/dashboard/add-supervisor" class="text-blue-600 hover:text-blue-700 font-medium">
+          Add your first supervisor
+        </a>
+      </div>
+      <div *ngIf="recentSupervisors.length > 0" class="space-y-4">
+        <div *ngFor="let supervisor of recentSupervisors" class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+          <div class="flex items-center space-x-3">
+            <div class="h-10 w-10 bg-blue-100 rounded-full flex items-center justify-center">
+              <i class="fas fa-user-cog text-blue-600"></i>
+            </div>
+            <div>
+              <p class="font-medium text-gray-900">{{ supervisor.name }}</p>
+              <p class="text-sm text-gray-500">{{ supervisor.farmName }}</p>
+            </div>
+          </div>
+          <div class="text-right">
+            <p class="text-sm text-gray-500">{{ supervisor.createdAt | date:'shortDate' }}</p>
+          </div>
+        </div>
+        <a routerLink="/dashboard/supervisors" class="block text-center text-blue-600 hover:text-blue-700 font-medium py-2">
+          View all supervisors →
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Performance Overview -->
+  <div class="bg-white rounded-xl shadow-lg p-6 border border-gray-200">
+    <h3 class="text-lg font-semibold text-gray-900 mb-4">
+      <i class="fas fa-chart-line mr-2 text-purple-600"></i>
+      Operations Overview
+    </h3>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div class="text-center">
+        <div class="h-16 w-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
+          <i class="fas fa-check-circle text-green-600 text-2xl"></i>
+        </div>
+        <p class="text-2xl font-bold text-gray-900">{{ stats.completedTasks }}</p>
+        <p class="text-sm text-gray-600">Completed Tasks</p>
+      </div>
+
+      <div class="text-center">
+        <div class="h-16 w-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
+          <i class="fas fa-clock text-blue-600 text-2xl"></i>
+        </div>
+        <p class="text-2xl font-bold text-gray-900">{{ stats.activeTasks }}</p>
+        <p class="text-sm text-gray-600">Active Tasks</p>
+      </div>
+
+      <div class="text-center">
+        <div class="h-16 w-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-3">
+          <i class="fas fa-users text-purple-600 text-2xl"></i>
+        </div>
+        <p class="text-2xl font-bold text-gray-900">{{ stats.totalSupervisors + stats.totalWorkers }}</p>
+        <p class="text-sm text-gray-600">Total Team Members</p>
+      </div>
+    </div>
+  </div>
+</div>

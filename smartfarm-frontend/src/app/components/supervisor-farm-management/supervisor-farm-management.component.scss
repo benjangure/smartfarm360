@@ -1,0 +1,35 @@
+/* Supervisor Farm Management Styles */
+.assignment-card {
+  transition: all 0.2s ease-in-out;
+}
+
+.assignment-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+.farm-card {
+  transition: all 0.2s ease-in-out;
+}
+
+.farm-card:hover {
+  background-color: #f0fdf4;
+  border-color: #16a34a;
+}
+
+.modal-overlay {
+  backdrop-filter: blur(4px);
+}
+
+.status-badge {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
